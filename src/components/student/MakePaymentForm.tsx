@@ -23,6 +23,20 @@ type FeeType = {
   term?: string;
 };
 
+function StepHeader({ num, label }: { num: number; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-3">
+      <div
+        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+        style={{ background: "var(--color-secondary)", color: "var(--color-primary-dark)" }}
+      >
+        {num}
+      </div>
+      <span className="text-sm font-semibold text-slate-700">{label}</span>
+    </div>
+  );
+}
+
 export default function MakePaymentForm() {
   const { session } = useAuth();
   const [selectedTerm, setSelectedTerm] = useState<Term | "">("");
@@ -33,7 +47,6 @@ export default function MakePaymentForm() {
   const [error, setError] = useState("");
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
 
-  // Query student data and all fee types
   const { data } = db.useQuery({
     students: {
       $: { where: { id: session?.id ?? "" } },
@@ -46,7 +59,6 @@ export default function MakePaymentForm() {
   const allFeeTypes = (data?.feeTypes ?? []) as FeeType[];
   const currency = getCurrency(student?.nationalityGroup);
 
-  // Filter fee types by student's school/class and selected term
   const matchingFeeTypes = useMemo(() => {
     if (!selectedTerm || !student) return [];
     return allFeeTypes.filter((ft) => {
@@ -62,11 +74,8 @@ export default function MakePaymentForm() {
     });
   }, [selectedTerm, allFeeTypes, student]);
 
-  const selectedFeeType = matchingFeeTypes.find(
-    (ft) => ft.id === selectedFeeTypeId
-  );
+  const selectedFeeType = matchingFeeTypes.find((ft) => ft.id === selectedFeeTypeId);
 
-  // Compute balance for the selected fee type
   const paidForSelectedFee = useMemo(() => {
     if (!selectedFeeType || !student) return 0;
     return (student.payments ?? [])
@@ -146,7 +155,6 @@ export default function MakePaymentForm() {
         currency,
       });
 
-      // Reset form
       setSelectedTerm("");
       setSelectedFeeTypeId("");
       setAmountToPay("");
@@ -160,10 +168,11 @@ export default function MakePaymentForm() {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Term selection */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+
+        {/* Step 1: Term */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">1. Select Term</h3>
+          <StepHeader num={1} label="Select Term" />
           <div className="grid grid-cols-3 gap-3">
             {TERMS.map((t) => (
               <button
@@ -173,11 +182,12 @@ export default function MakePaymentForm() {
                   setSelectedTerm(t);
                   setSelectedFeeTypeId("");
                 }}
-                className={`py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                className="py-3 rounded-xl border text-sm font-semibold transition-all"
+                style={
                   selectedTerm === t
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                }`}
+                    ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "white", boxShadow: "0 2px 8px rgba(11,61,145,0.3)" }
+                    : { background: "white", borderColor: "#cbd5e1", color: "#475569" }
+                }
               >
                 {t}
               </button>
@@ -185,16 +195,16 @@ export default function MakePaymentForm() {
           </div>
         </div>
 
-        {/* Fee selection */}
+        {/* Step 2: Fee selection */}
         {selectedTerm && (
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">2. Select Fee</h3>
+            <StepHeader num={2} label="Select Fee" />
             {matchingFeeTypes.length === 0 ? (
-              <p className="text-sm text-gray-400 bg-gray-50 rounded-lg px-4 py-3">
+              <p className="text-sm text-slate-400 bg-slate-50 rounded-xl px-4 py-3">
                 No fee types available for {selectedTerm}.
               </p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {matchingFeeTypes.map((ft) => {
                   const paid = (student?.payments ?? [])
                     .filter((p) => {
@@ -203,6 +213,7 @@ export default function MakePaymentForm() {
                     })
                     .reduce((sum: number, p) => sum + (p.amountPaid ?? 0), 0);
                   const bal = Math.max(0, (ft.amount ?? 0) - paid);
+                  const isSelected = selectedFeeTypeId === ft.id;
 
                   return (
                     <button
@@ -210,19 +221,20 @@ export default function MakePaymentForm() {
                       type="button"
                       onClick={() => setSelectedFeeTypeId(ft.id)}
                       disabled={bal <= 0}
-                      className={`w-full text-left flex items-center justify-between rounded-lg border px-4 py-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                        selectedFeeTypeId === ft.id
-                          ? "bg-blue-50 border-blue-500"
-                          : "bg-white border-gray-200 hover:border-blue-300"
-                      }`}
+                      className="w-full text-left flex items-center justify-between rounded-xl border-2 px-4 py-3.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={
+                        isSelected
+                          ? { borderColor: "var(--color-primary)", background: "rgba(11,61,145,0.04)" }
+                          : { borderColor: "#e2e8f0", background: "white" }
+                      }
                     >
                       <div>
-                        <p className="text-sm font-medium text-gray-800">{ft.feeName}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-sm font-semibold text-slate-800">{ft.feeName}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">
                           {bal <= 0 ? "Fully paid" : `Balance: ${formatCurrency(bal, currency)}`}
                         </p>
                       </div>
-                      <span className="text-sm font-bold text-gray-700">
+                      <span className="text-sm font-bold text-slate-700">
                         {formatCurrency(ft.amount ?? 0, currency)}
                       </span>
                     </button>
@@ -233,20 +245,24 @@ export default function MakePaymentForm() {
           </div>
         )}
 
-        {/* Amount + method */}
+        {/* Steps 3 & 4: Amount + Method */}
         {selectedFeeTypeId && remainingBalance > 0 && (
           <>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-              <p className="text-xs text-blue-600 font-medium">Remaining Balance</p>
-              <p className="text-xl font-bold text-blue-800 mt-0.5">
+            {/* Remaining balance box */}
+            <div
+              className="rounded-xl px-4 py-3 border"
+              style={{ background: "rgba(11,61,145,0.04)", borderColor: "rgba(11,61,145,0.18)" }}
+            >
+              <p className="text-xs font-medium" style={{ color: "rgba(11,61,145,0.7)" }}>Remaining Balance</p>
+              <p className="text-xl font-bold mt-0.5" style={{ color: "var(--color-primary)" }}>
                 {formatCurrency(remainingBalance, currency)}
               </p>
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">3. Amount to Pay</h3>
+              <StepHeader num={3} label="Amount to Pay" />
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">
                   {currency === "USD" ? "$" : "GHS"}
                 </span>
                 <input
@@ -257,24 +273,29 @@ export default function MakePaymentForm() {
                   value={amountToPay}
                   onChange={(e) => setAmountToPay(e.target.value)}
                   placeholder="0.00"
-                  className="w-full border border-gray-300 rounded-lg pl-12 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-slate-300 rounded-xl py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent ring-offset-1 transition-shadow placeholder:text-slate-400"
+                  style={{
+                    paddingLeft: currency === "USD" ? "2.5rem" : "3.5rem",
+                    "--tw-ring-color": "var(--color-primary)",
+                  } as React.CSSProperties}
                 />
               </div>
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">4. Payment Method</h3>
+              <StepHeader num={4} label="Payment Method" />
               <div className="grid grid-cols-2 gap-3">
                 {PAYMENT_METHODS.map((method) => (
                   <button
                     key={method}
                     type="button"
                     onClick={() => setPaymentMethod(method)}
-                    className={`py-3 rounded-lg border text-sm font-medium flex flex-col items-center gap-1.5 transition-colors ${
+                    className="py-4 rounded-xl border-2 text-sm font-semibold flex flex-col items-center gap-2 transition-all"
+                    style={
                       paymentMethod === method
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                    }`}
+                        ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "white", boxShadow: "0 4px 12px rgba(11,61,145,0.3)" }
+                        : { background: "white", borderColor: "#e2e8f0", color: "#475569" }
+                    }
                   >
                     {method === "Mobile Money" ? (
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -294,7 +315,7 @@ export default function MakePaymentForm() {
         )}
 
         {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          <p className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5">
             {error}
           </p>
         )}
@@ -303,7 +324,7 @@ export default function MakePaymentForm() {
           <Button
             type="submit"
             loading={loading}
-            className="w-full py-3 text-base"
+            className="w-full py-3.5 text-base font-semibold rounded-xl"
           >
             Confirm Payment
           </Button>

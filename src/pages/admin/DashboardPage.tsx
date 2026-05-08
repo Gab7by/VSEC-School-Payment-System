@@ -4,6 +4,13 @@ import { useAdminDashboardStats, type DashboardFilter } from "../../hooks/useAdm
 import StatCard from "../../components/ui/Card";
 import { formatCurrency } from "../../lib/utils";
 
+const FILTER_OPTIONS: { label: string; value: DashboardFilter }[] = [
+  { label: "All School Types", value: "All" },
+  { label: "VSEC — Ghanaian", value: "VSEC — Ghanaian" },
+  { label: "VSEC — International", value: "VSEC — International" },
+  { label: "Donkor Kids", value: "Donkor Kids Talent International School" },
+];
+
 export default function DashboardPage() {
   const [filter, setFilter] = useState<DashboardFilter>("All");
   const { isLoading, stats } = useAdminDashboardStats(filter);
@@ -25,16 +32,48 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
-          <p className="text-sm text-gray-500">Overview of school payment statistics</p>
+          <h2 className="text-lg font-semibold text-slate-900">Dashboard</h2>
+          <p className="text-sm text-slate-500">Overview of school payment statistics</p>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex flex-col gap-3 sm:items-end">
+          {/* Pill filter tabs */}
+          <div className="flex flex-wrap gap-2">
+            {FILTER_OPTIONS.map(({ label, value }) => (
+              <button
+                key={value}
+                onClick={() => setFilter(value)}
+                className="px-4 py-1.5 rounded-full text-sm font-medium border transition-all"
+                style={
+                  filter === value
+                    ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "white" }
+                    : { background: "white", borderColor: "#cbd5e1", color: "#475569" }
+                }
+                onMouseEnter={(e) => {
+                  if (filter !== value) {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-primary)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "var(--color-primary)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (filter !== value) {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "#cbd5e1";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#475569";
+                  }
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Reset button */}
           {stats && stats.totalPaid > 0 && (
             <button
               onClick={() => setShowResetModal(true)}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-rose-600 border border-rose-300 rounded-xl hover:bg-rose-50 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -42,23 +81,13 @@ export default function DashboardPage() {
               Reset Fees Paid
             </button>
           )}
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as DashboardFilter)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
-          >
-            <option value="All">All School Types (GHS)</option>
-            <option value="VSEC — Ghanaian">VSEC — Ghanaian (GHS)</option>
-            <option value="VSEC — International">VSEC — International (USD)</option>
-            <option value="Donkor Kids Talent International School">Donkor Kids</option>
-          </select>
         </div>
       </div>
 
       {isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 bg-gray-100 rounded-xl animate-pulse" />
+            <div key={i} className="h-28 bg-slate-100 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : stats ? (
@@ -88,47 +117,55 @@ export default function DashboardPage() {
         </div>
       ) : null}
 
-      {/* Filter note */}
-      {filter === "All" ? (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-          <p className="text-sm text-blue-800">
-            International student fees (USD) are excluded from these totals — select <strong>VSEC — International</strong> to view USD statistics.
+      {/* Filter info banner */}
+      <div
+        className="rounded-xl px-4 py-3 border text-sm"
+        style={{ background: "rgba(11,61,145,0.04)", borderColor: "rgba(11,61,145,0.15)" }}
+      >
+        {filter === "All" ? (
+          <p style={{ color: "rgba(11,61,145,0.75)" }}>
+            International student fees (USD) are excluded from these totals — select{" "}
+            <strong>VSEC — International</strong> to view USD statistics.
           </p>
-        </div>
-      ) : (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-          <p className="text-sm text-blue-800">
+        ) : (
+          <p style={{ color: "rgba(11,61,145,0.75)" }}>
             Showing statistics for <strong>{filter}</strong> students only.
-            {filter === "VSEC — International" && <span className="ml-1">Amounts in <strong>USD ($)</strong>.</span>}
+            {filter === "VSEC — International" && (
+              <span className="ml-1">Amounts in <strong>USD ($)</strong>.</span>
+            )}
           </p>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Reset Fees Confirmation Modal */}
       {showResetModal && stats && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/40" onClick={() => !resetting && setShowResetModal(false)} />
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div
+            className="fixed inset-0 backdrop-blur-sm"
+            style={{ background: "rgba(15,23,42,0.6)" }}
+            onClick={() => !resetting && setShowResetModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md p-6 space-y-4 animate-scale-in">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="shrink-0 w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-base font-semibold text-gray-900">Reset Fees Paid</h3>
-                <p className="text-sm text-gray-500 mt-1">This action cannot be undone.</p>
+                <h3 className="text-base font-semibold text-slate-900">Reset Fees Paid</h3>
+                <p className="text-sm text-slate-500 mt-0.5">This action cannot be undone.</p>
               </div>
             </div>
 
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2 text-sm">
-              <p className="text-red-800">
+            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2 text-sm">
+              <p className="text-rose-800">
                 This will permanently delete{" "}
                 <strong>{stats.filteredPaymentIds.length} payment record{stats.filteredPaymentIds.length !== 1 ? "s" : ""}</strong>{" "}
                 and reset the total fees paid to{" "}
                 <strong>{stats.currency === "USD" ? "$0.00" : "GHS 0.00"}</strong>.
               </p>
-              <p className="text-red-700">
+              <p className="text-rose-700">
                 <span className="font-medium">Scope:</span>{" "}
                 {filter === "All" ? "All school types" : filter}
               </p>
@@ -138,16 +175,21 @@ export default function DashboardPage() {
               <button
                 onClick={() => setShowResetModal(false)}
                 disabled={resetting}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 border border-slate-300 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleReset}
                 disabled={resetting}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 rounded-lg transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-60 rounded-xl transition-colors"
               >
-                {resetting ? "Resetting…" : "Confirm Reset"}
+                {resetting ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Resetting…
+                  </span>
+                ) : "Confirm Reset"}
               </button>
             </div>
           </div>

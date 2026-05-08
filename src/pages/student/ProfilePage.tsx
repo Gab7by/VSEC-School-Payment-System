@@ -9,13 +9,11 @@ import Button from "../../components/ui/Button";
 export default function ProfilePage() {
   const { session, refreshSession } = useAuth();
 
-  // Edit name
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(session?.name ?? "");
   const [nameLoading, setNameLoading] = useState(false);
   const [nameError, setNameError] = useState("");
 
-  // Change password
   const [currentPwd, setCurrentPwd] = useState("");
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
@@ -66,7 +64,6 @@ export default function ProfilePage() {
 
     setPwdLoading(true);
     try {
-      // Verify current password
       const result = await db.queryOnce({
         students: { $: { where: { id: session.id } } },
       });
@@ -101,21 +98,30 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
-        <p className="text-sm text-gray-500">Manage your personal information</p>
+        <h2 className="text-lg font-semibold text-slate-900">Profile</h2>
+        <p className="text-sm text-slate-500">Manage your personal information</p>
       </div>
 
       {/* First-login banner */}
       {session?.isFirstLogin && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex gap-3">
-          <svg className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div
+          className="rounded-2xl p-4 flex gap-3 border"
+          style={{ background: "linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(251,191,36,0.06) 100%)", borderColor: "rgba(212,175,55,0.35)" }}
+        >
+          <svg
+            className="w-5 h-5 shrink-0 mt-0.5"
+            style={{ color: "var(--color-secondary-dark)" }}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <div>
-            <p className="text-sm font-semibold text-yellow-800">
+            <p className="text-sm font-semibold text-amber-900">
               Please change your default password
             </p>
-            <p className="text-xs text-yellow-700 mt-0.5">
+            <p className="text-xs text-amber-800/70 mt-0.5">
               You are using a system-generated password. Change it below for security.
             </p>
           </div>
@@ -123,22 +129,23 @@ export default function ProfilePage() {
       )}
 
       {/* Personal Information */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-800">Personal Information</h3>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-sm font-semibold text-slate-900">Personal Information</h3>
           {!editingName && (
             <button
               onClick={() => { setEditingName(true); setNewName(session?.name ?? ""); }}
-              className="text-xs text-blue-600 hover:underline font-medium"
+              className="text-xs font-semibold hover:underline transition-colors"
+              style={{ color: "var(--color-primary)" }}
             >
               Edit Name
             </button>
           )}
         </div>
 
-        <div className="space-y-3 text-sm">
+        <div className="space-y-1 text-sm">
           {editingName ? (
-            <form onSubmit={handleSaveName} className="flex gap-2 items-end">
+            <form onSubmit={handleSaveName} className="flex gap-2 items-end pb-3">
               <div className="flex-1">
                 <Input
                   label="Full Name"
@@ -151,7 +158,7 @@ export default function ProfilePage() {
               <Button type="submit" loading={nameLoading} size="sm">Save</Button>
               <Button
                 type="button"
-                variant="secondary"
+                variant="ghost"
                 size="sm"
                 onClick={() => { setEditingName(false); setNameError(""); }}
               >
@@ -176,8 +183,8 @@ export default function ProfilePage() {
       </div>
 
       {/* Change Password */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="text-sm font-semibold text-gray-800 mb-4">Change Password</h3>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 className="text-sm font-semibold text-slate-900 mb-5">Change Password</h3>
 
         <form onSubmit={handleChangePassword} className="space-y-4">
           <Input
@@ -206,12 +213,12 @@ export default function ProfilePage() {
           />
 
           {pwdError && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <p className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5">
               {pwdError}
             </p>
           )}
           {pwdSuccess && (
-            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+            <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
               Password updated successfully!
             </p>
           )}
@@ -235,9 +242,9 @@ function InfoRow({
   mono?: boolean;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-2 border-b border-gray-50 last:border-0">
-      <span className="text-gray-500 shrink-0">{label}</span>
-      <span className={`text-gray-800 font-medium text-right ${mono ? "font-mono text-xs" : ""}`}>
+    <div className="flex items-start justify-between gap-4 py-2.5 border-b border-slate-100 last:border-0">
+      <span className="text-slate-500 shrink-0 text-sm">{label}</span>
+      <span className={`text-slate-900 font-semibold text-right text-sm ${mono ? "font-mono text-xs" : ""}`}>
         {value}
       </span>
     </div>

@@ -15,14 +15,16 @@ export default function Select({
   ...props
 }: Props) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <label className="text-sm font-medium text-slate-700">{label}</label>
       )}
       <select
         {...props}
-        className={`border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-400 bg-white ${
-          error ? "border-red-400 focus:ring-red-400" : "border-gray-300"
+        className={`border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:border-transparent ring-offset-1 transition-shadow disabled:bg-slate-50 disabled:text-slate-400 bg-white ${
+          error
+            ? "border-rose-400 focus:ring-rose-400"
+            : "border-slate-300 focus:ring-primary"
         } ${className}`}
       >
         {placeholder && (
@@ -32,7 +34,7 @@ export default function Select({
         )}
         {children}
       </select>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-rose-600">{error}</p>}
     </div>
   );
 }

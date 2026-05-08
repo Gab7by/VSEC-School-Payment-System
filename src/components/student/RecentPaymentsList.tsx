@@ -21,11 +21,12 @@ export default function RecentPaymentsList({ payments, onViewAll, currency = "GH
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-800">Recent Payments</h3>
+        <h3 className="text-base font-semibold text-slate-900">Recent Payments</h3>
         {payments.length > 0 && (
           <button
             onClick={onViewAll}
-            className="text-xs text-blue-600 hover:underline font-medium"
+            className="text-xs font-semibold hover:underline transition-colors"
+            style={{ color: "var(--color-primary)" }}
           >
             View All
           </button>
@@ -33,23 +34,25 @@ export default function RecentPaymentsList({ payments, onViewAll, currency = "GH
       </div>
 
       {recent.length === 0 ? (
-        <div className="bg-gray-50 rounded-xl p-6 text-center text-gray-400 text-sm">
+        <div className="bg-slate-50 rounded-2xl p-8 text-center text-slate-400 text-sm">
           No payments yet.
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {recent.map((p) => (
             <div
               key={p.id}
-              className="bg-white border border-gray-100 rounded-lg px-4 py-3 flex items-center justify-between gap-4"
+              className="bg-white border border-slate-100 rounded-xl px-4 py-3.5 flex items-center justify-between gap-4 hover:shadow-sm transition-all"
+              onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "rgba(11,61,145,0.2)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "")}
             >
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{p.feeName}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {p.term} Term · {p.paymentDate ? formatDate(p.paymentDate) : ""}
+                <p className="text-sm font-semibold text-slate-800 truncate">{p.feeName}</p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {p.term} · {p.paymentDate ? formatDate(p.paymentDate) : ""}
                 </p>
               </div>
-              <p className="text-sm font-bold text-green-700 shrink-0">
+              <p className="text-sm font-bold text-emerald-600 shrink-0">
                 {formatCurrency(p.amountPaid ?? 0, currency)}
               </p>
             </div>

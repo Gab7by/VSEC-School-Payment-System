@@ -27,116 +27,131 @@ export default function FeesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">Fee Management</h2>
-        <p className="text-sm text-gray-500">Create and manage school fee types</p>
+        <h2 className="text-lg font-semibold text-slate-900">Fee Management</h2>
+        <p className="text-sm text-slate-500">Create and manage school fee types</p>
       </div>
 
       <CreateFeeTypeForm />
 
       {/* Existing fee types table */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">
+        <h3 className="text-sm font-semibold text-slate-700 mb-3">
           Existing Fee Types ({feeTypes.length})
         </h3>
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center text-gray-400 text-sm">Loading…</div>
+            <div className="p-10 text-center text-slate-400 text-sm">Loading…</div>
           ) : feeTypes.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">
+            <div className="p-10 text-center text-slate-400 text-sm">
               No fee types created yet.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="text-left px-4 py-3 font-medium text-gray-500">Fee Name</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-500">Amount</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-500 whitespace-nowrap">School</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-500">Campus / Mode / Group</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-500">Class</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-500">Term</th>
-                    <th className="px-4 py-3" />
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Fee Name</th>
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">School</th>
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Campus / Mode / Group</th>
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Class</th>
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Term</th>
+                    <th className="px-5 py-3.5" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {feeTypes.map((ft) => (
-                    <tr key={ft.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-gray-900">{ft.feeName}</td>
-                      <td className="px-4 py-3 font-medium">
-                        <span className={ft.schoolType === VSEC_SCHOOL && ft.nationalityGroup === "International" ? "text-blue-700" : "text-green-700"}>
-                          {formatCurrency(ft.amount ?? 0, getCurrency(ft.nationalityGroup))}
-                        </span>
-                        {ft.schoolType === VSEC_SCHOOL && (
-                          <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
-                            ft.nationalityGroup === "International"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-green-100 text-green-700"
-                          }`}>
-                            {getCurrency(ft.nationalityGroup)}
+                <tbody className="divide-y divide-slate-100">
+                  {feeTypes.map((ft) => {
+                    const currency = getCurrency(ft.nationalityGroup);
+                    const isIntl = ft.schoolType === VSEC_SCHOOL && ft.nationalityGroup === "International";
+                    return (
+                      <tr
+                        key={ft.id}
+                        className="transition-colors"
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(11,61,145,0.03)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+                      >
+                        <td className="px-5 py-3.5 font-semibold text-slate-900">{ft.feeName}</td>
+                        <td className="px-5 py-3.5">
+                          <span className={`font-bold ${isIntl ? "text-blue-700" : "text-emerald-700"}`}>
+                            {formatCurrency(ft.amount ?? 0, currency)}
                           </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          ft.schoolType === VSEC_SCHOOL
-                            ? "bg-purple-100 text-purple-700"
-                            : "bg-teal-100 text-teal-700"
-                        }`}>
-                          {ft.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {ft.schoolType === VSEC_SCHOOL ? (
-                          <div>
-                            <p className="text-xs text-gray-700">
-                              {ft.allCampuses ? ALL_CAMPUSES_LABEL : (ft.campus || "—")}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {ft.allStudyModes ? ALL_STUDY_MODES_LABEL : (ft.studyMode || "—")}
-                            </p>
-                            {ft.nationalityGroup && (
-                              <p className="text-xs text-gray-500 mt-0.5 font-medium">
-                                {ft.nationalityGroup}
-                              </p>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-xs text-gray-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-gray-700 text-sm">{ft.classLevel}</td>
-                      <td className="px-4 py-3 text-gray-700 text-sm">{ft.term}</td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        {confirmDeleteId === ft.id ? (
-                          <span className="inline-flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Delete?</span>
-                            <button
-                              onClick={() => handleDelete(ft.id)}
-                              disabled={deleting}
-                              className="text-xs font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 px-2 py-1 rounded transition-colors"
+                          {ft.schoolType === VSEC_SCHOOL && (
+                            <span
+                              className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold"
+                              style={
+                                isIntl
+                                  ? { background: "rgba(212,175,55,0.15)", color: "var(--color-secondary-dark)" }
+                                  : { background: "rgba(16,185,129,0.1)", color: "#065f46" }
+                              }
                             >
-                              {deleting ? "…" : "Yes"}
-                            </button>
-                            <button
-                              onClick={() => setConfirmDeleteId(null)}
-                              disabled={deleting}
-                              className="text-xs font-medium text-gray-600 hover:text-gray-800 px-2 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
-                            >
-                              No
-                            </button>
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => setConfirmDeleteId(ft.id)}
-                            className="text-xs text-red-500 hover:text-red-700 font-medium hover:underline"
+                              {currency}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <span
+                            className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold"
+                            style={
+                              ft.schoolType === VSEC_SCHOOL
+                                ? { background: "rgba(11,61,145,0.1)", color: "var(--color-primary)" }
+                                : { background: "#ccfbf1", color: "#0f766e" }
+                            }
                           >
-                            Delete
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                            {ft.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          {ft.schoolType === VSEC_SCHOOL ? (
+                            <div>
+                              <p className="text-xs text-slate-700 font-medium">
+                                {ft.allCampuses ? ALL_CAMPUSES_LABEL : (ft.campus || "—")}
+                              </p>
+                              <p className="text-xs text-slate-400 mt-0.5">
+                                {ft.allStudyModes ? ALL_STUDY_MODES_LABEL : (ft.studyMode || "—")}
+                              </p>
+                              {ft.nationalityGroup && (
+                                <p className="text-xs text-slate-500 mt-0.5 font-semibold">
+                                  {ft.nationalityGroup}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-slate-400">—</span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 text-slate-600">{ft.classLevel}</td>
+                        <td className="px-5 py-3.5 text-slate-600">{ft.term}</td>
+                        <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                          {confirmDeleteId === ft.id ? (
+                            <span className="inline-flex items-center gap-2">
+                              <span className="text-xs text-slate-500">Delete?</span>
+                              <button
+                                onClick={() => handleDelete(ft.id)}
+                                disabled={deleting}
+                                className="text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-60 px-2.5 py-1 rounded-lg transition-colors"
+                              >
+                                {deleting ? "…" : "Yes"}
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteId(null)}
+                                disabled={deleting}
+                                className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors"
+                              >
+                                No
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmDeleteId(ft.id)}
+                              className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:underline transition-colors"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

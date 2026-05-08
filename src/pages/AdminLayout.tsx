@@ -57,49 +57,63 @@ export default function AdminLayout() {
   const headerTitle = activeNav?.label ?? "Admin Portal";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-56 bg-white border-r border-gray-200 flex flex-col transform transition-transform duration-200 ${
+        className={`fixed inset-y-0 left-0 z-30 w-60 flex flex-col transform transition-transform duration-200 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:relative lg:translate-x-0`}
+        style={{ background: "var(--color-primary)" }}
       >
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+        {/* Logo area */}
+        <div
+          className="flex items-center gap-3 px-5 py-5 border-b border-white/10"
+          style={{ background: "var(--color-primary-dark)" }}
+        >
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ring-2"
+            style={{ background: "var(--color-secondary)", outlineColor: "rgba(212,175,55,0.4)" }}
+          >
+            <svg className="w-5 h-5" style={{ color: "var(--color-primary-dark)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 2.485-.82 4.777-2.19 6.617L12 22l-6.81-3.383A12.083 12.083 0 013 12c0-.935.116-1.844.336-2.711L12 14z" />
             </svg>
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-900 leading-none">VSEC School</p>
-            <p className="text-xs text-gray-400 mt-0.5">Admin Portal</p>
+            <p className="text-sm font-bold text-white leading-none">VSEC School</p>
+            <p className="text-xs text-white/50 mt-0.5">Admin Portal</p>
           </div>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-5 space-y-1">
           {navItems.map(({ key, label, icon }) => (
             <button
               key={key}
               onClick={() => { navigate(`/admin/${key}`); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                 isActive(key)
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-100"
+                  ? "text-white border-l-2"
+                  : "text-white/60 hover:text-white hover:bg-white/10"
               }`}
+              style={isActive(key) ? {
+                background: "rgba(255,255,255,0.12)",
+                borderLeftColor: "var(--color-secondary)",
+              } : {}}
             >
-              {icon}
+              <span style={isActive(key) ? { color: "var(--color-secondary)" } : {}}>
+                {icon}
+              </span>
               {label}
             </button>
           ))}
         </nav>
 
         {/* Admin info at bottom */}
-        <div className="px-3 py-4 border-t border-gray-100">
-          <div className="bg-gray-50 rounded-lg px-3 py-2">
-            <p className="text-xs font-medium text-gray-700 truncate">{session?.name}</p>
-            <p className="text-xs text-gray-400 truncate">{session?.email}</p>
+        <div className="px-3 py-4 border-t border-white/10">
+          <div className="rounded-xl px-3 py-2.5" style={{ background: "rgba(0,0,0,0.2)" }}>
+            <p className="text-xs font-semibold text-white/80 truncate">{session?.name}</p>
+            <p className="text-xs text-white/40 truncate mt-0.5">{session?.email}</p>
           </div>
         </div>
       </aside>
@@ -107,7 +121,7 @@ export default function AdminLayout() {
       {/* Sidebar backdrop (mobile) */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/30 lg:hidden"
+          className="fixed inset-0 z-20 bg-primary/80 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -115,17 +129,17 @@ export default function AdminLayout() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top header */}
-        <header className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-1.5 text-gray-500 hover:text-gray-700"
+            className="lg:hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
 
-          <h1 className="text-base font-semibold text-gray-900 hidden lg:block capitalize">
+          <h1 className="text-base font-semibold text-slate-900 hidden lg:block">
             {headerTitle}
           </h1>
           <div className="lg:hidden flex-1" />
@@ -134,17 +148,18 @@ export default function AdminLayout() {
           <div className="relative">
             <button
               onClick={() => setMenuOpen((v) => !v)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors"
             >
-              <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-xs font-bold text-blue-700">
-                  {session?.name?.[0]?.toUpperCase()}
-                </span>
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                style={{ background: "var(--color-primary)" }}
+              >
+                {session?.name?.[0]?.toUpperCase()}
               </div>
-              <span className="text-sm font-medium text-gray-700 hidden sm:block">
+              <span className="text-sm font-medium text-slate-700 hidden sm:block">
                 {session?.name}
               </span>
-              <svg className="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </button>
@@ -152,19 +167,20 @@ export default function AdminLayout() {
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-20 py-1">
+                <div className="absolute right-0 mt-1 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 z-20 py-2 animate-scale-in">
                   <button
                     onClick={() => { setMenuOpen(false); setShowChangePwd(true); }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors"
                   >
-                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                     </svg>
                     Change Password
                   </button>
+                  <div className="mx-4 my-1 border-t border-slate-100" />
                   <button
                     onClick={() => { setMenuOpen(false); logout(); }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -20,6 +20,8 @@ import {
 import Select from "../ui/Select";
 import Button from "../ui/Button";
 
+const inputCls = "w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:border-transparent ring-offset-1 transition-shadow placeholder:text-slate-400 disabled:bg-slate-50 disabled:text-slate-400";
+
 export default function CreateFeeTypeForm() {
   const [feeName, setFeeName] = useState("");
   const [amount, setAmount] = useState("");
@@ -104,9 +106,11 @@ export default function CreateFeeTypeForm() {
     }
   }
 
+  const currencyLabel = nationalityGroup ? getCurrency(nationalityGroup) : "GHS";
+
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-5">
-      <h3 className="text-sm font-semibold text-gray-800 mb-4">Create New Fee Type</h3>
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <h3 className="text-sm font-semibold text-slate-900 mb-5">Create New Fee Type</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
         <Select
@@ -193,21 +197,22 @@ export default function CreateFeeTypeForm() {
           ))}
         </Select>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">Fee Name</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-slate-700">Fee Name</label>
           <input
             type="text"
             value={feeName}
             onChange={(e) => setFeeName(e.target.value)}
             placeholder="e.g. Total Admission Fee"
             disabled={loading}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputCls}
+            style={{ "--tw-ring-color": "var(--color-primary)" } as React.CSSProperties}
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">
-            Amount ({nationalityGroup ? getCurrency(nationalityGroup) : "GHS"})
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-slate-700">
+            Amount ({currencyLabel})
           </label>
           <input
             type="number"
@@ -217,7 +222,8 @@ export default function CreateFeeTypeForm() {
             onChange={(e) => setAmount(e.target.value)}
             placeholder="e.g. 500.00"
             disabled={loading}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputCls}
+            style={{ "--tw-ring-color": "var(--color-primary)" } as React.CSSProperties}
           />
         </div>
 
@@ -229,12 +235,12 @@ export default function CreateFeeTypeForm() {
       </div>
 
       {error && (
-        <p className="mt-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+        <p className="mt-4 text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5">
           {error}
         </p>
       )}
       {success && (
-        <p className="mt-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+        <p className="mt-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
           Fee type created successfully!
         </p>
       )}

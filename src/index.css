@@ -11,26 +11,55 @@
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
+/* ── Existing modal / entrance animations ── */
 @keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+.animate-scale-in { animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in  { animation: fadeIn  0.2s ease both; }
 
-.animate-scale-in {
-  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+/* ── Logo animations ── */
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-7px); }
 }
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 0 0px  rgba(212,175,55,0));    }
+  50%       { filter: drop-shadow(0 0 10px rgba(212,175,55,0.55)); }
+}
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(212,175,55,0.4); }
+  60%       { box-shadow: 0 0 0 6px rgba(212,175,55,0);   }
+}
+.animate-logo-float { animation: logoFloat 3.5s ease-in-out infinite; }
+.animate-logo-glow  { animation: logoGlow  2.8s ease-in-out infinite; }
+.animate-logo-pulse { animation: logoPulse 2.5s ease-out    infinite; }
 
-.animate-fade-in {
-  animation: fadeIn 0.2s ease both;
+/* ── Page-content slide-up with stagger ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
+.animate-slide-up          { animation: slideUp 0.35s                  cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-up-delay-1  { animation: slideUp 0.35s 0.07s            cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-up-delay-2  { animation: slideUp 0.35s 0.14s            cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-up-delay-3  { animation: slideUp 0.35s 0.21s            cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ── Shimmer sweep (student welcome card) ── */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(280%)  skewX(-15deg); }
+}
+.animate-shimmer { animation: shimmer 3s ease-in-out infinite; }
+
+/* ── Nav active-dot bounce ── */
+@keyframes navDot {
+  0%, 100% { transform: scale(1);   }
+  50%       { transform: scale(1.6); }
+}
+.animate-nav-dot { animation: navDot 1.8s ease-in-out infinite; }

@@ -24,12 +24,10 @@ export default function HomePage() {
         className="rounded-2xl p-6 relative overflow-hidden"
         style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 60%, #1a52b3 100%)" }}
       >
-        {/* Decorative circles */}
-        <div
-          className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-20"
-          style={{ background: "var(--color-secondary)" }}
-        />
-        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full opacity-5 bg-white -translate-x-6 translate-y-6" />
+        
+        
+        
+       
 
         <p className="text-blue-200 text-sm font-medium relative">Welcome back,</p>
         <h2 className="text-3xl font-bold text-white mt-0.5 relative">{session?.name}</h2>

@@ -70,14 +70,8 @@ export default function AdminLayout() {
           className="flex items-center gap-3 px-5 py-5 border-b border-white/10"
           style={{ background: "var(--color-primary-dark)" }}
         >
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ring-2"
-            style={{ background: "var(--color-secondary)", outlineColor: "rgba(212,175,55,0.4)" }}
-          >
-            <svg className="w-5 h-5" style={{ color: "var(--color-primary-dark)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 14l9-5-9-5-9 5 9 5z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 2.485-.82 4.777-2.19 6.617L12 22l-6.81-3.383A12.083 12.083 0 013 12c0-.935.116-1.844.336-2.711L12 14z" />
-            </svg>
+          <div className="animate-logo-pulse shrink-0 rounded-full overflow-hidden bg-white w-10 h-10 flex items-center justify-center">
+            <img src="/vsec-logo.png" alt="VSEC" className="w-10 h-10 object-contain" />
           </div>
           <div>
             <p className="text-sm font-bold text-white leading-none">VSEC School</p>

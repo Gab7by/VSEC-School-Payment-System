@@ -47,9 +47,9 @@ const defaultIcons: Record<string, React.ReactNode> = {
 export default function StatCard({ label, value, sub, color = "blue", icon }: Props) {
   const c = colorMap[color];
   return (
-    <div className={`rounded-2xl p-5 ${c.bg} shadow-sm relative overflow-hidden`}>
-      {/* Decorative circle */}
-      <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/10 rounded-full" />
+    <div className={`rounded-2xl p-5 ${c.bg} shadow-sm relative overflow-hidden hover:scale-[1.02] transition-transform duration-200`}>
+      
+      
       <div className="relative">
         <div className="flex items-start justify-between mb-3">
           <p className="text-xs font-semibold uppercase tracking-widest text-white/70">{label}</p>

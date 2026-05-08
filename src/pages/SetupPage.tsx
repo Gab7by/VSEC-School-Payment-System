@@ -65,14 +65,12 @@ export default function SetupPage() {
 
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative animate-scale-in">
         <div className="text-center mb-7">
-          <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5"
-            style={{ background: "var(--color-primary)" }}
-          >
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 2.485-.82 4.777-2.19 6.617L12 22l-6.81-3.383A12.083 12.083 0 013 12c0-2.485.82-4.777 2.19-6.617L12 9l6.16 3.422z" />
-            </svg>
+          <div className="animate-logo-float animate-logo-glow mb-5 inline-block">
+            <img
+              src="/vsec-logo.png"
+              alt="VSEC"
+              className="w-20 h-20 object-contain drop-shadow-lg"
+            />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">VSEC School</h1>
           <p className="text-slate-500 text-sm mt-1">Payment Management System</p>

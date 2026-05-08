@@ -11,13 +11,13 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-primary hover:bg-primary-dark text-white shadow-sm hover:shadow-md hover:-translate-y-px disabled:bg-primary/50 disabled:translate-y-0 disabled:shadow-sm",
+    "bg-primary hover:bg-primary-dark text-white shadow-sm hover:shadow-md hover:-translate-y-px active:scale-[0.97] disabled:bg-primary/50 disabled:translate-y-0 disabled:shadow-sm",
   secondary:
-    "bg-secondary hover:bg-secondary-dark text-white shadow-sm hover:shadow-md hover:-translate-y-px disabled:bg-secondary/50 disabled:translate-y-0 disabled:shadow-sm",
+    "bg-secondary hover:bg-secondary-dark text-white shadow-sm hover:shadow-md hover:-translate-y-px active:scale-[0.97] disabled:bg-secondary/50 disabled:translate-y-0 disabled:shadow-sm",
   danger:
-    "bg-rose-600 hover:bg-rose-700 text-white shadow-sm hover:shadow-md hover:-translate-y-px disabled:bg-rose-400 disabled:translate-y-0",
+    "bg-rose-600 hover:bg-rose-700 text-white shadow-sm hover:shadow-md hover:-translate-y-px active:scale-[0.97] disabled:bg-rose-400 disabled:translate-y-0",
   ghost:
-    "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50",
+    "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.97] disabled:opacity-50",
 };
 
 const sizeClasses: Record<Size, string> = {

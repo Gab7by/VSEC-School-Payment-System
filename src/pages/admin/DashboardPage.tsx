@@ -92,28 +92,36 @@ export default function DashboardPage() {
         </div>
       ) : stats ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            label="Total Students"
-            value={String(stats.totalStudents)}
-            sub={filter !== "All" ? `of ${stats.totalStudentsAll} total` : undefined}
-            color="blue"
-          />
-          <StatCard
-            label="Total Revenue"
-            value={formatCurrency(stats.totalRevenue, stats.currency)}
-            sub="Expected fees"
-            color="gray"
-          />
-          <StatCard
-            label="Total Fees Paid"
-            value={formatCurrency(stats.totalPaid, stats.currency)}
-            color="green"
-          />
-          <StatCard
-            label="Outstanding Fees"
-            value={formatCurrency(stats.outstanding, stats.currency)}
-            color="red"
-          />
+          <div className="animate-slide-up">
+            <StatCard
+              label="Total Students"
+              value={String(stats.totalStudents)}
+              sub={filter !== "All" ? `of ${stats.totalStudentsAll} total` : undefined}
+              color="blue"
+            />
+          </div>
+          <div className="animate-slide-up-delay-1">
+            <StatCard
+              label="Total Revenue"
+              value={formatCurrency(stats.totalRevenue, stats.currency)}
+              sub="Expected fees"
+              color="gray"
+            />
+          </div>
+          <div className="animate-slide-up-delay-2">
+            <StatCard
+              label="Total Fees Paid"
+              value={formatCurrency(stats.totalPaid, stats.currency)}
+              color="green"
+            />
+          </div>
+          <div className="animate-slide-up-delay-3">
+            <StatCard
+              label="Outstanding Fees"
+              value={formatCurrency(stats.outstanding, stats.currency)}
+              color="red"
+            />
+          </div>
         </div>
       ) : null}
 

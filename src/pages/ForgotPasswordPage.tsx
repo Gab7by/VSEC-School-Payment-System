@@ -1,16 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { db } from "../lib/db";
 import { hashPassword } from "../lib/utils";
 import { useAuth } from "../context/AuthContext";
 
-type Props = {
-  onBack: () => void;
-};
-
 type Step = "email" | "otp" | "newPassword";
 
-export default function ForgotPasswordPage({ onBack }: Props) {
+export default function ForgotPasswordPage() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -19,7 +17,6 @@ export default function ForgotPasswordPage({ onBack }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Stores which table the user was found in after email verification
   const [userInfo, setUserInfo] = useState<{
     id: string;
     role: "admin" | "student";
@@ -36,7 +33,6 @@ export default function ForgotPasswordPage({ onBack }: Props) {
 
     setLoading(true);
     try {
-      // Verify email exists in our system
       const adminResult = await db.queryOnce({
         admins: { $: { where: { email: normalizedEmail } } },
       });
@@ -100,7 +96,6 @@ export default function ForgotPasswordPage({ onBack }: Props) {
     setLoading(true);
     try {
       await db.auth.sendMagicCode({ email: email.trim().toLowerCase() });
-      setError(""); // clear any previous error
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to resend code."
@@ -149,10 +144,7 @@ export default function ForgotPasswordPage({ onBack }: Props) {
         );
       }
 
-      // Clear InstantDB's temporary auth session
       await db.auth.signOut();
-
-      // Log in with the new password using our custom auth
       await login(email, newPassword);
     } catch (err) {
       setError(
@@ -231,7 +223,7 @@ export default function ForgotPasswordPage({ onBack }: Props) {
             </button>
             <button
               type="button"
-              onClick={onBack}
+              onClick={() => navigate("/login")}
               className="w-full text-sm text-gray-500 hover:text-gray-700"
             >
               ← Back to login

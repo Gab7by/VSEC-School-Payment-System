@@ -1,18 +1,11 @@
 import { useState, type ReactElement } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ChangeAdminPasswordModal from "../components/admin/ChangeAdminPasswordModal";
-import DashboardPage from "./admin/DashboardPage";
-import StudentsPage from "./admin/StudentsPage";
-import FeesPage from "./admin/FeesPage";
-import PaymentsPage from "./admin/PaymentsPage";
-import type { AdminSection } from "../App";
 
-type Props = {
-  currentSection: AdminSection;
-  onNavigate: (section: AdminSection) => void;
-};
+type AdminNavKey = "dashboard" | "students" | "fees" | "payments";
 
-const navItems: { key: AdminSection; label: string; icon: ReactElement }[] = [
+const navItems: { key: AdminNavKey; label: string; icon: ReactElement }[] = [
   {
     key: "dashboard",
     label: "Dashboard",
@@ -51,18 +44,17 @@ const navItems: { key: AdminSection; label: string; icon: ReactElement }[] = [
   },
 ];
 
-export default function AdminLayout({ currentSection, onNavigate }: Props) {
+export default function AdminLayout() {
   const { session, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [showChangePwd, setShowChangePwd] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const sectionComponents: Record<AdminSection, ReactElement> = {
-    dashboard: <DashboardPage />,
-    students: <StudentsPage />,
-    fees: <FeesPage />,
-    payments: <PaymentsPage />,
-  };
+  const isActive = (key: AdminNavKey) => location.pathname === `/admin/${key}`;
+  const activeNav = navItems.find((n) => location.pathname === `/admin/${n.key}`);
+  const headerTitle = activeNav?.label ?? "Admin Portal";
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -90,9 +82,9 @@ export default function AdminLayout({ currentSection, onNavigate }: Props) {
           {navItems.map(({ key, label, icon }) => (
             <button
               key={key}
-              onClick={() => { onNavigate(key); setSidebarOpen(false); }}
+              onClick={() => { navigate(`/admin/${key}`); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                currentSection === key
+                isActive(key)
                   ? "bg-blue-50 text-blue-700"
                   : "text-gray-600 hover:bg-gray-100"
               }`}
@@ -134,7 +126,7 @@ export default function AdminLayout({ currentSection, onNavigate }: Props) {
           </button>
 
           <h1 className="text-base font-semibold text-gray-900 hidden lg:block capitalize">
-            {currentSection === "dashboard" ? "Dashboard" : navItems.find(n => n.key === currentSection)?.label}
+            {headerTitle}
           </h1>
           <div className="lg:hidden flex-1" />
 
@@ -187,7 +179,7 @@ export default function AdminLayout({ currentSection, onNavigate }: Props) {
 
         {/* Page content */}
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          {sectionComponents[currentSection]}
+          <Outlet />
         </main>
       </div>
 

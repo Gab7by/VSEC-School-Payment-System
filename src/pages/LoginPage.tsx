@@ -1,12 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-type Props = {
-  onForgotPassword: () => void;
-};
-
-export default function LoginPage({ onForgotPassword }: Props) {
+export default function LoginPage() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -91,7 +89,7 @@ export default function LoginPage({ onForgotPassword }: Props) {
           <div className="text-center">
             <button
               type="button"
-              onClick={onForgotPassword}
+              onClick={() => navigate("/forgot-password")}
               className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
             >
               Forgot password?

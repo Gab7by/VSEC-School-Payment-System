@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { db } from "./lib/db";
 import { useAuth } from "./context/AuthContext";
 import SetupPage from "./pages/SetupPage";
@@ -6,20 +6,18 @@ import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import AdminLayout from "./pages/AdminLayout";
 import StudentLayout from "./pages/StudentLayout";
-
-export type AdminSection = "dashboard" | "students" | "fees" | "payments";
-export type StudentSection = "home" | "payments" | "history" | "profile";
-type TopPage = "login" | "forgot-password";
+import DashboardPage from "./pages/admin/DashboardPage";
+import StudentsPage from "./pages/admin/StudentsPage";
+import FeesPage from "./pages/admin/FeesPage";
+import PaymentsPage from "./pages/admin/PaymentsPage";
+import HomePage from "./pages/student/HomePage";
+import StudentPaymentsPage from "./pages/student/PaymentsPage";
+import HistoryPage from "./pages/student/HistoryPage";
+import ProfilePage from "./pages/student/ProfilePage";
 
 function App() {
   const { session, isLoading: authLoading } = useAuth();
-  const [topPage, setTopPage] = useState<TopPage>("login");
-  const [adminSection, setAdminSection] = useState<AdminSection>("dashboard");
-  const [studentSection, setStudentSection] = useState<StudentSection>("home");
-
-  const { data: adminData, isLoading: adminsLoading } = db.useQuery({
-    admins: {},
-  });
+  const { data: adminData, isLoading: adminsLoading } = db.useQuery({ admins: {} });
 
   if (authLoading || adminsLoading) {
     return (
@@ -32,39 +30,44 @@ function App() {
     );
   }
 
-  // No session — show auth pages
   if (!session) {
-    // First-time setup: no admins exist yet
-    if (adminData?.admins?.length === 0) {
-      return <SetupPage />;
-    }
-
-    if (topPage === "forgot-password") {
-      return (
-        <ForgotPasswordPage onBack={() => setTopPage("login")} />
-      );
-    }
-
+    const noAdmins = (adminData?.admins?.length ?? 0) === 0;
     return (
-      <LoginPage onForgotPassword={() => setTopPage("forgot-password")} />
+      <Routes>
+        {noAdmins && <Route path="/setup" element={<SetupPage />} />}
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to={noAdmins ? "/setup" : "/login"} replace />} />
+      </Routes>
     );
   }
 
-  // Authenticated — show the correct portal
   if (session.role === "admin") {
     return (
-      <AdminLayout
-        currentSection={adminSection}
-        onNavigate={(section: AdminSection) => setAdminSection(section)}
-      />
+      <Routes>
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/dashboard" element={<DashboardPage />} />
+          <Route path="/admin/students" element={<StudentsPage />} />
+          <Route path="/admin/fees" element={<FeesPage />} />
+          <Route path="/admin/payments" element={<PaymentsPage />} />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+      </Routes>
     );
   }
 
   return (
-    <StudentLayout
-      currentSection={studentSection}
-      onNavigate={(section: StudentSection) => setStudentSection(section)}
-    />
+    <Routes>
+      <Route element={<StudentLayout />}>
+        <Route path="/student/home" element={<HomePage />} />
+        <Route path="/student/payments" element={<StudentPaymentsPage />} />
+        <Route path="/student/history" element={<HistoryPage />} />
+        <Route path="/student/profile" element={<ProfilePage />} />
+        <Route path="/student" element={<Navigate to="/student/home" replace />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/student/home" replace />} />
+    </Routes>
   );
 }
 

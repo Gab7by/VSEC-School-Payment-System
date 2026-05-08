@@ -1,16 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useStudentPaymentSummary } from "../../hooks/useStudentPaymentSummary";
 import { VSEC_SCHOOL } from "../../lib/constants";
 import SummaryCards from "../../components/student/SummaryCards";
 import RecentPaymentsList from "../../components/student/RecentPaymentsList";
-import type { StudentSection } from "../StudentLayout";
 
-type Props = {
-  onNavigate: (section: StudentSection) => void;
-};
-
-export default function HomePage({ onNavigate }: Props) {
+export default function HomePage() {
   const { session } = useAuth();
+  const navigate = useNavigate();
   const { isLoading, summary, payments } = useStudentPaymentSummary(
     session?.id ?? ""
   );
@@ -65,7 +62,7 @@ export default function HomePage({ onNavigate }: Props) {
 
       {/* Pay Now button */}
       <button
-        onClick={() => onNavigate("payments")}
+        onClick={() => navigate("/student/payments")}
         className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold text-base hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +74,7 @@ export default function HomePage({ onNavigate }: Props) {
       {/* Recent payments */}
       <RecentPaymentsList
         payments={sortedPayments}
-        onViewAll={() => onNavigate("history")}
+        onViewAll={() => navigate("/student/history")}
       />
     </div>
   );

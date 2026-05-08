@@ -1,19 +1,11 @@
 import { useEffect, type ReactElement } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import HomePage from "./student/HomePage";
-import StudentPaymentsPage from "./student/PaymentsPage";
-import HistoryPage from "./student/HistoryPage";
-import ProfilePage from "./student/ProfilePage";
 
-export type StudentSection = "home" | "payments" | "history" | "profile";
-
-type Props = {
-  currentSection: StudentSection;
-  onNavigate: (section: StudentSection) => void;
-};
+type StudentNavKey = "home" | "payments" | "history" | "profile";
 
 type NavItem = {
-  key: StudentSection;
+  key: StudentNavKey;
   label: string;
   icon: (active: boolean) => ReactElement;
 };
@@ -57,22 +49,16 @@ const navItems: NavItem[] = [
   },
 ];
 
-export default function StudentLayout({ currentSection, onNavigate }: Props) {
+export default function StudentLayout() {
   const { session, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Force first-login students to profile page
   useEffect(() => {
-    if (session?.isFirstLogin && currentSection !== "profile") {
-      onNavigate("profile");
+    if (session?.isFirstLogin && location.pathname !== "/student/profile") {
+      navigate("/student/profile", { replace: true });
     }
-  }, [session?.isFirstLogin, currentSection, onNavigate]);
-
-  const sectionComponents: Record<StudentSection, ReactElement> = {
-    home: <HomePage onNavigate={onNavigate} />,
-    payments: <StudentPaymentsPage />,
-    history: <HistoryPage />,
-    profile: <ProfilePage />,
-  };
+  }, [session?.isFirstLogin, location.pathname, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -102,18 +88,18 @@ export default function StudentLayout({ currentSection, onNavigate }: Props) {
 
       {/* Main content */}
       <main className="flex-1 overflow-auto p-4 pb-24">
-        {sectionComponents[currentSection]}
+        <Outlet />
       </main>
 
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
         <div className="flex">
           {navItems.map(({ key, label, icon }) => {
-            const active = currentSection === key;
+            const active = location.pathname === `/student/${key}`;
             return (
               <button
                 key={key}
-                onClick={() => onNavigate(key)}
+                onClick={() => navigate(`/student/${key}`)}
                 className={`flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors ${
                   active ? "text-blue-600" : "text-gray-400 hover:text-gray-600"
                 }`}

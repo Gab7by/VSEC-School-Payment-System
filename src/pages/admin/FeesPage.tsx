@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { db } from "../../lib/db";
+import { VSEC_SCHOOL, ALL_CAMPUSES_LABEL, ALL_STUDY_MODES_LABEL } from "../../lib/constants";
 import CreateFeeTypeForm from "../../components/admin/CreateFeeTypeForm";
 import { formatCurrency } from "../../lib/utils";
 
@@ -51,7 +52,8 @@ export default function FeesPage() {
                   <tr className="bg-gray-50 border-b border-gray-100">
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Fee Name</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Amount</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-500 whitespace-nowrap">School Type</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-500 whitespace-nowrap">School</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-500">Campus / Mode</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Class</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Term</th>
                     <th className="px-4 py-3" />
@@ -66,15 +68,29 @@ export default function FeesPage() {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          ft.schoolType === "Adult School"
+                          ft.schoolType === VSEC_SCHOOL
                             ? "bg-purple-100 text-purple-700"
                             : "bg-teal-100 text-teal-700"
                         }`}>
-                          {ft.schoolType}
+                          {ft.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-gray-700">{ft.classLevel}</td>
-                      <td className="px-4 py-3 text-gray-700">{ft.term} Term</td>
+                      <td className="px-4 py-3">
+                        {ft.schoolType === VSEC_SCHOOL ? (
+                          <div>
+                            <p className="text-xs text-gray-700">
+                              {ft.allCampuses ? ALL_CAMPUSES_LABEL : (ft.campus || "—")}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {ft.allStudyModes ? ALL_STUDY_MODES_LABEL : (ft.studyMode || "—")}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700 text-sm">{ft.classLevel}</td>
+                      <td className="px-4 py-3 text-gray-700 text-sm">{ft.term}</td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         {confirmDeleteId === ft.id ? (
                           <span className="inline-flex items-center gap-2">

@@ -1,5 +1,6 @@
 import { useAuth } from "../../context/AuthContext";
 import { useStudentPaymentSummary } from "../../hooks/useStudentPaymentSummary";
+import { VSEC_SCHOOL } from "../../lib/constants";
 import SummaryCards from "../../components/student/SummaryCards";
 import RecentPaymentsList from "../../components/student/RecentPaymentsList";
 import type { StudentSection } from "../StudentLayout";
@@ -24,10 +25,20 @@ export default function HomePage({ onNavigate }: Props) {
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-5 text-white">
         <p className="text-blue-200 text-sm font-medium">Welcome back,</p>
         <h2 className="text-2xl font-bold mt-0.5">{session?.name}</h2>
-        <div className="flex flex-wrap gap-3 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3">
           <span className="bg-blue-500/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-            {session?.schoolType}
+            {session?.schoolType === VSEC_SCHOOL ? "VSEC College" : session?.schoolType}
           </span>
+          {session?.schoolType === VSEC_SCHOOL && session?.campus && (
+            <span className="bg-blue-500/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+              {session.campus}
+            </span>
+          )}
+          {session?.schoolType === VSEC_SCHOOL && session?.studyMode && (
+            <span className="bg-blue-500/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+              {session.studyMode}
+            </span>
+          )}
           <span className="bg-blue-500/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
             {session?.classLevel}
           </span>

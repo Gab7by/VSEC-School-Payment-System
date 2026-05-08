@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../lib/db";
 import { hashPassword } from "../../lib/utils";
+import { VSEC_SCHOOL } from "../../lib/constants";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 
@@ -162,7 +163,13 @@ export default function ProfilePage() {
           )}
           <InfoRow label="Student ID" value={session?.studentId ?? "—"} mono />
           <InfoRow label="Email" value={session?.email ?? "—"} />
-          <InfoRow label="School Type" value={session?.schoolType ?? "—"} />
+          <InfoRow label="School" value={session?.schoolType ?? "—"} />
+          {session?.schoolType === VSEC_SCHOOL && (
+            <>
+              <InfoRow label="Campus" value={session?.campus ?? "—"} />
+              <InfoRow label="Study Mode" value={session?.studyMode ?? "—"} />
+            </>
+          )}
           <InfoRow label="Class" value={session?.classLevel ?? "—"} />
         </div>
       </div>

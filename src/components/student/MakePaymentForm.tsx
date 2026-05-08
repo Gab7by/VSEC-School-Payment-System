@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { db } from "../../lib/db";
 import { id } from "@instantdb/react";
 import { generateTransactionId, formatCurrency } from "../../lib/utils";
-import { TERMS, PAYMENT_METHODS, type Term, type PaymentMethod } from "../../lib/constants";
+import { TERMS, PAYMENT_METHODS, VSEC_SCHOOL, type Term, type PaymentMethod } from "../../lib/constants";
 import { useAuth } from "../../context/AuthContext";
 import Button from "../ui/Button";
 import PaymentSuccessModal from "../admin/PaymentSuccessModal";
@@ -15,6 +15,10 @@ type FeeType = {
   schoolType?: string;
   classLevel?: string;
   allClasses?: boolean;
+  campus?: string;
+  studyMode?: string;
+  allCampuses?: boolean;
+  allStudyModes?: boolean;
   term?: string;
 };
 
@@ -43,12 +47,16 @@ export default function MakePaymentForm() {
   // Filter fee types by student's school/class and selected term
   const matchingFeeTypes = useMemo(() => {
     if (!selectedTerm || !student) return [];
-    return allFeeTypes.filter(
-      (ft) =>
-        ft.term === selectedTerm &&
-        ft.schoolType === student.schoolType &&
-        (ft.allClasses || ft.classLevel === student.classLevel)
-    );
+    return allFeeTypes.filter((ft) => {
+      if (ft.term !== selectedTerm) return false;
+      if (ft.schoolType !== student.schoolType) return false;
+      if (!ft.allClasses && ft.classLevel !== student.classLevel) return false;
+      if (student.schoolType === VSEC_SCHOOL) {
+        if (!ft.allCampuses && ft.campus !== student.campus) return false;
+        if (!ft.allStudyModes && ft.studyMode !== student.studyMode) return false;
+      }
+      return true;
+    });
   }, [selectedTerm, allFeeTypes, student]);
 
   const selectedFeeType = matchingFeeTypes.find(
@@ -166,7 +174,7 @@ export default function MakePaymentForm() {
                     : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
                 }`}
               >
-                {t} Term
+                {t}
               </button>
             ))}
           </div>
@@ -178,7 +186,7 @@ export default function MakePaymentForm() {
             <h3 className="text-sm font-semibold text-gray-700 mb-3">2. Select Fee</h3>
             {matchingFeeTypes.length === 0 ? (
               <p className="text-sm text-gray-400 bg-gray-50 rounded-lg px-4 py-3">
-                No fee types available for {selectedTerm} Term.
+                No fee types available for {selectedTerm}.
               </p>
             ) : (
               <div className="space-y-2">

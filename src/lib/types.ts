@@ -26,5 +26,7 @@ export type Session = {
   studentId?: string;
   schoolType?: string;
   classLevel?: string;
+  campus?: string;
+  studyMode?: string;
   isFirstLogin?: boolean;
 };

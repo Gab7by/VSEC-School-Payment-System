@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { db } from "../../lib/db";
+import { VSEC_SCHOOL } from "../../lib/constants";
 import AddStudentModal from "../../components/admin/AddStudentModal";
 import ChangeClassModal from "../../components/admin/ChangeClassModal";
 import type { Student } from "../../lib/types";
@@ -82,7 +83,7 @@ export default function StudentsPage() {
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Student Name</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 whitespace-nowrap">School Type</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Email</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">Class</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Class / Enrollment</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Action</th>
                 </tr>
               </thead>
@@ -97,21 +98,28 @@ export default function StudentsPage() {
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        student.schoolType === "Adult School"
+                        student.schoolType === VSEC_SCHOOL
                           ? "bg-purple-100 text-purple-700"
                           : "bg-teal-100 text-teal-700"
                       }`}>
-                        {student.schoolType}
+                        {student.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-600 text-xs">{student.email}</td>
-                    <td className="px-4 py-3 text-gray-700">{student.classLevel}</td>
+                    <td className="px-4 py-3">
+                      <p className="text-sm text-gray-700">{student.classLevel}</p>
+                      {student.schoolType === VSEC_SCHOOL && (
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {[student.campus, student.studyMode].filter(Boolean).join(" · ") || "—"}
+                        </p>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => setEditStudent(student as Student)}
                         className="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
                       >
-                        Change Class
+                        Edit Enrollment
                       </button>
                     </td>
                   </tr>

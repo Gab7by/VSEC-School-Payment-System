@@ -72,6 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         studentId: student.studentId,
         schoolType: student.schoolType,
         classLevel: student.classLevel,
+        campus: student.campus,
+        studyMode: student.studyMode,
         isFirstLogin: student.isFirstLogin,
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(s));

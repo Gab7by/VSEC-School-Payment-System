@@ -22,8 +22,10 @@ export function useAdminDashboardStats(filterSchoolType: SchoolType | "All") {
 
   // Collect all payments for filtered students
   let totalPaid = 0;
+  const filteredPaymentIds: string[] = [];
   for (const student of filteredStudents) {
     for (const payment of student.payments ?? []) {
+      filteredPaymentIds.push(payment.id);
       totalPaid += payment.amountPaid ?? 0;
     }
   }
@@ -52,6 +54,7 @@ export function useAdminDashboardStats(filterSchoolType: SchoolType | "All") {
       totalPaid,
       outstanding,
       filteredIds,
+      filteredPaymentIds,
     },
   };
 }

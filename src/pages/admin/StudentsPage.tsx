@@ -9,6 +9,26 @@ export default function StudentsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [search, setSearch] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDeleteStudent(studentId: string) {
+    setDeleting(true);
+    try {
+      const result = await db.queryOnce({
+        students: { $: { where: { id: studentId } }, payments: {} },
+      });
+      const student = result.data.students?.[0];
+      const paymentIds = (student?.payments ?? []).map((p) => p.id);
+      await db.transact([
+        ...paymentIds.map((pid) => db.tx.payments[pid].delete()),
+        db.tx.students[studentId].delete(),
+      ]);
+      setConfirmDeleteId(null);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   const { data, isLoading } = db.useQuery({
     students: { $: { order: { createdAt: "desc" } } },
@@ -114,13 +134,41 @@ export default function StudentsPage() {
                         </p>
                       )}
                     </td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setEditStudent(student as Student)}
-                        className="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
-                      >
-                        Edit Enrollment
-                      </button>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {confirmDeleteId === student.id ? (
+                        <span className="inline-flex items-center gap-2">
+                          <span className="text-xs text-gray-500">Delete?</span>
+                          <button
+                            onClick={() => handleDeleteStudent(student.id)}
+                            disabled={deleting}
+                            className="text-xs font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 px-2 py-1 rounded transition-colors"
+                          >
+                            {deleting ? "…" : "Yes"}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            disabled={deleting}
+                            className="text-xs font-medium text-gray-600 hover:text-gray-800 px-2 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
+                          >
+                            No
+                          </button>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-3">
+                          <button
+                            onClick={() => setEditStudent(student as Student)}
+                            className="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                          >
+                            Edit Enrollment
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(student.id)}
+                            className="text-xs text-red-500 hover:text-red-700 font-medium hover:underline"
+                          >
+                            Delete
+                          </button>
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

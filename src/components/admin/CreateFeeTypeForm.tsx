@@ -8,11 +8,14 @@ import {
   VSEC_SCHOOL,
   VSEC_CAMPUSES,
   VSEC_STUDY_MODES,
+  VSEC_NATIONALITY_GROUPS,
   ALL_CLASSES_LABEL,
   ALL_CAMPUSES_LABEL,
   ALL_STUDY_MODES_LABEL,
+  getCurrency,
   type SchoolType,
   type Term,
+  type VsecNationalityGroup,
 } from "../../lib/constants";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
@@ -23,6 +26,7 @@ export default function CreateFeeTypeForm() {
   const [schoolType, setSchoolType] = useState<SchoolType | "">("");
   const [campus, setCampus] = useState("");
   const [studyMode, setStudyMode] = useState("");
+  const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">("");
   const [classLevel, setClassLevel] = useState("");
   const [term, setTerm] = useState<Term | "">("");
   const [error, setError] = useState("");
@@ -45,8 +49,8 @@ export default function CreateFeeTypeForm() {
       setError("All fields are required.");
       return;
     }
-    if (isVsec && (!campus || !studyMode)) {
-      setError("Campus and Study Mode are required for VSEC College of Studies.");
+    if (isVsec && (!campus || !studyMode || !nationalityGroup)) {
+      setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
       return;
     }
     const numAmount = parseFloat(amount);
@@ -70,12 +74,14 @@ export default function CreateFeeTypeForm() {
                 studyMode,
                 allCampuses: campus === ALL_CAMPUSES_LABEL,
                 allStudyModes: studyMode === ALL_STUDY_MODES_LABEL,
+                nationalityGroup,
               }
             : {
                 campus: "",
                 studyMode: "",
                 allCampuses: false,
                 allStudyModes: false,
+                nationalityGroup: "",
               }),
           term,
           createdAt: Date.now(),
@@ -86,6 +92,7 @@ export default function CreateFeeTypeForm() {
       setSchoolType("");
       setCampus("");
       setStudyMode("");
+      setNationalityGroup("");
       setClassLevel("");
       setTerm("");
       setSuccess(true);
@@ -110,6 +117,7 @@ export default function CreateFeeTypeForm() {
             setClassLevel("");
             setCampus("");
             setStudyMode("");
+            setNationalityGroup("");
           }}
           placeholder="Select school type"
           disabled={loading}
@@ -144,6 +152,18 @@ export default function CreateFeeTypeForm() {
               <option value={ALL_STUDY_MODES_LABEL}>{ALL_STUDY_MODES_LABEL}</option>
               {VSEC_STUDY_MODES.map((m) => (
                 <option key={m} value={m}>{m}</option>
+              ))}
+            </Select>
+
+            <Select
+              label="Nationality Group"
+              value={nationalityGroup}
+              onChange={(e) => setNationalityGroup(e.target.value as VsecNationalityGroup)}
+              placeholder="Select nationality group"
+              disabled={loading}
+            >
+              {VSEC_NATIONALITY_GROUPS.map((g) => (
+                <option key={g} value={g}>{g}</option>
               ))}
             </Select>
           </>
@@ -186,7 +206,9 @@ export default function CreateFeeTypeForm() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">Amount (GHS)</label>
+          <label className="text-sm font-medium text-gray-700">
+            Amount ({nationalityGroup ? getCurrency(nationalityGroup) : "GHS"})
+          </label>
           <input
             type="number"
             min="0.01"

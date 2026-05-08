@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { db } from "../../lib/db";
-import { VSEC_SCHOOL, ALL_CAMPUSES_LABEL, ALL_STUDY_MODES_LABEL } from "../../lib/constants";
+import { VSEC_SCHOOL, ALL_CAMPUSES_LABEL, ALL_STUDY_MODES_LABEL, getCurrency } from "../../lib/constants";
 import CreateFeeTypeForm from "../../components/admin/CreateFeeTypeForm";
 import { formatCurrency } from "../../lib/utils";
 
@@ -53,7 +53,7 @@ export default function FeesPage() {
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Fee Name</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Amount</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-500 whitespace-nowrap">School</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-500">Campus / Mode</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-500">Campus / Mode / Group</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Class</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-500">Term</th>
                     <th className="px-4 py-3" />
@@ -63,8 +63,19 @@ export default function FeesPage() {
                   {feeTypes.map((ft) => (
                     <tr key={ft.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 font-medium text-gray-900">{ft.feeName}</td>
-                      <td className="px-4 py-3 text-green-700 font-medium">
-                        {formatCurrency(ft.amount ?? 0)}
+                      <td className="px-4 py-3 font-medium">
+                        <span className={ft.schoolType === VSEC_SCHOOL && ft.nationalityGroup === "International" ? "text-blue-700" : "text-green-700"}>
+                          {formatCurrency(ft.amount ?? 0, getCurrency(ft.nationalityGroup))}
+                        </span>
+                        {ft.schoolType === VSEC_SCHOOL && (
+                          <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+                            ft.nationalityGroup === "International"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-green-100 text-green-700"
+                          }`}>
+                            {getCurrency(ft.nationalityGroup)}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
@@ -84,6 +95,11 @@ export default function FeesPage() {
                             <p className="text-xs text-gray-400 mt-0.5">
                               {ft.allStudyModes ? ALL_STUDY_MODES_LABEL : (ft.studyMode || "—")}
                             </p>
+                            {ft.nationalityGroup && (
+                              <p className="text-xs text-gray-500 mt-0.5 font-medium">
+                                {ft.nationalityGroup}
+                              </p>
+                            )}
                           </div>
                         ) : (
                           <span className="text-xs text-gray-400">—</span>

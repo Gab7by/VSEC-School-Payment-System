@@ -12,9 +12,10 @@ type Payment = {
 type Props = {
   payments: Payment[];
   onViewAll: () => void;
+  currency?: "GHS" | "USD";
 };
 
-export default function RecentPaymentsList({ payments, onViewAll }: Props) {
+export default function RecentPaymentsList({ payments, onViewAll, currency = "GHS" }: Props) {
   const recent = payments.slice(0, 5);
 
   return (
@@ -49,7 +50,7 @@ export default function RecentPaymentsList({ payments, onViewAll }: Props) {
                 </p>
               </div>
               <p className="text-sm font-bold text-green-700 shrink-0">
-                {formatCurrency(p.amountPaid ?? 0)}
+                {formatCurrency(p.amountPaid ?? 0, currency)}
               </p>
             </div>
           ))}

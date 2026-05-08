@@ -12,9 +12,11 @@ import {
   VSEC_SCHOOL,
   VSEC_CAMPUSES,
   VSEC_STUDY_MODES,
+  VSEC_NATIONALITY_GROUPS,
   type SchoolType,
   type VsecCampus,
   type VsecStudyMode,
+  type VsecNationalityGroup,
 } from "../../lib/constants";
 import Modal from "../ui/Modal";
 import Input from "../ui/Input";
@@ -32,6 +34,7 @@ export default function AddStudentModal({ onClose }: Props) {
   const [classLevel, setClassLevel] = useState("");
   const [campus, setCampus] = useState<VsecCampus | "">("");
   const [studyMode, setStudyMode] = useState<VsecStudyMode | "">("");
+  const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
@@ -53,8 +56,8 @@ export default function AddStudentModal({ onClose }: Props) {
       setError("All fields are required.");
       return;
     }
-    if (isVsec && (!campus || !studyMode)) {
-      setError("Campus and Study Mode are required for VSEC College of Studies.");
+    if (isVsec && (!campus || !studyMode || !nationalityGroup)) {
+      setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
       return;
     }
 
@@ -71,7 +74,7 @@ export default function AddStudentModal({ onClose }: Props) {
           email: email.trim().toLowerCase(),
           schoolType,
           classLevel,
-          ...(isVsec ? { campus, studyMode } : {}),
+          ...(isVsec ? { campus, studyMode, nationalityGroup } : {}),
           passwordHash: hash,
           isFirstLogin: true,
           createdAt: Date.now(),
@@ -130,6 +133,12 @@ export default function AddStudentModal({ onClose }: Props) {
               <div className="flex justify-between">
                 <span className="text-gray-500">Study Mode</span>
                 <span className="font-medium">{studyMode}</span>
+              </div>
+            )}
+            {isVsec && nationalityGroup && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Nationality Group</span>
+                <span className="font-medium">{nationalityGroup}</span>
               </div>
             )}
             <div className="flex justify-between">
@@ -204,6 +213,7 @@ export default function AddStudentModal({ onClose }: Props) {
             setClassLevel("");
             setCampus("");
             setStudyMode("");
+            setNationalityGroup("");
           }}
           placeholder="Select school type"
           disabled={loading}
@@ -236,6 +246,18 @@ export default function AddStudentModal({ onClose }: Props) {
             >
               {VSEC_STUDY_MODES.map((m) => (
                 <option key={m} value={m}>{m}</option>
+              ))}
+            </Select>
+
+            <Select
+              label="Nationality Group"
+              value={nationalityGroup}
+              onChange={(e) => setNationalityGroup(e.target.value as VsecNationalityGroup)}
+              placeholder="Select nationality group"
+              disabled={loading}
+            >
+              {VSEC_NATIONALITY_GROUPS.map((g) => (
+                <option key={g} value={g}>{g}</option>
               ))}
             </Select>
           </>

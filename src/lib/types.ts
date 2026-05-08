@@ -28,5 +28,6 @@ export type Session = {
   classLevel?: string;
   campus?: string;
   studyMode?: string;
+  nationalityGroup?: string;
   isFirstLogin?: boolean;
 };

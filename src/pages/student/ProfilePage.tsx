@@ -168,6 +168,7 @@ export default function ProfilePage() {
             <>
               <InfoRow label="Campus" value={session?.campus ?? "—"} />
               <InfoRow label="Study Mode" value={session?.studyMode ?? "—"} />
+              <InfoRow label="Nationality Group" value={session?.nationalityGroup ?? "—"} />
             </>
           )}
           <InfoRow label="Class" value={session?.classLevel ?? "—"} />

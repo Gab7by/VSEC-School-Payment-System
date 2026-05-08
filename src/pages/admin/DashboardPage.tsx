@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { db } from "../../lib/db";
-import { useAdminDashboardStats } from "../../hooks/useAdminDashboardStats";
+import { useAdminDashboardStats, type DashboardFilter } from "../../hooks/useAdminDashboardStats";
 import StatCard from "../../components/ui/Card";
 import { formatCurrency } from "../../lib/utils";
-import { SCHOOL_TYPES, type SchoolType } from "../../lib/constants";
 
 export default function DashboardPage() {
-  const [filter, setFilter] = useState<SchoolType | "All">("All");
+  const [filter, setFilter] = useState<DashboardFilter>("All");
   const { isLoading, stats } = useAdminDashboardStats(filter);
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -45,13 +44,13 @@ export default function DashboardPage() {
           )}
           <select
             value={filter}
-            onChange={(e) => setFilter(e.target.value as SchoolType | "All")}
+            onChange={(e) => setFilter(e.target.value as DashboardFilter)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
           >
-            <option value="All">All School Types</option>
-            {SCHOOL_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
+            <option value="All">All School Types (GHS)</option>
+            <option value="VSEC — Ghanaian">VSEC — Ghanaian (GHS)</option>
+            <option value="VSEC — International">VSEC — International (USD)</option>
+            <option value="Donkor Kids Talent International School">Donkor Kids</option>
           </select>
         </div>
       </div>
@@ -72,28 +71,35 @@ export default function DashboardPage() {
           />
           <StatCard
             label="Total Revenue"
-            value={formatCurrency(stats.totalRevenue)}
+            value={formatCurrency(stats.totalRevenue, stats.currency)}
             sub="Expected fees"
             color="gray"
           />
           <StatCard
             label="Total Fees Paid"
-            value={formatCurrency(stats.totalPaid)}
+            value={formatCurrency(stats.totalPaid, stats.currency)}
             color="green"
           />
           <StatCard
             label="Outstanding Fees"
-            value={formatCurrency(stats.outstanding)}
+            value={formatCurrency(stats.outstanding, stats.currency)}
             color="red"
           />
         </div>
       ) : null}
 
       {/* Filter note */}
-      {filter !== "All" && (
+      {filter === "All" ? (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+          <p className="text-sm text-blue-800">
+            International student fees (USD) are excluded from these totals — select <strong>VSEC — International</strong> to view USD statistics.
+          </p>
+        </div>
+      ) : (
         <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
           <p className="text-sm text-blue-800">
             Showing statistics for <strong>{filter}</strong> students only.
+            {filter === "VSEC — International" && <span className="ml-1">Amounts in <strong>USD ($)</strong>.</span>}
           </p>
         </div>
       )}
@@ -120,7 +126,7 @@ export default function DashboardPage() {
                 This will permanently delete{" "}
                 <strong>{stats.filteredPaymentIds.length} payment record{stats.filteredPaymentIds.length !== 1 ? "s" : ""}</strong>{" "}
                 and reset the total fees paid to{" "}
-                <strong>GHS 0.00</strong>.
+                <strong>{stats.currency === "USD" ? "$0.00" : "GHS 0.00"}</strong>.
               </p>
               <p className="text-red-700">
                 <span className="font-medium">Scope:</span>{" "}

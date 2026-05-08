@@ -130,7 +130,7 @@ export default function StudentsPage() {
                       <p className="text-sm text-gray-700">{student.classLevel}</p>
                       {student.schoolType === VSEC_SCHOOL && (
                         <p className="text-xs text-gray-400 mt-0.5">
-                          {[student.campus, student.studyMode].filter(Boolean).join(" · ") || "—"}
+                          {[student.campus, student.studyMode, student.nationalityGroup].filter(Boolean).join(" · ") || "—"}
                         </p>
                       )}
                     </td>

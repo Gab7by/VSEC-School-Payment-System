@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { db } from "../../lib/db";
 import { id } from "@instantdb/react";
 import { generateTransactionId, formatCurrency } from "../../lib/utils";
-import { TERMS, PAYMENT_METHODS, VSEC_SCHOOL, type Term, type PaymentMethod } from "../../lib/constants";
+import { TERMS, PAYMENT_METHODS, VSEC_SCHOOL, getCurrency, type Term, type PaymentMethod } from "../../lib/constants";
 import { useAuth } from "../../context/AuthContext";
 import Button from "../ui/Button";
 import PaymentSuccessModal from "../admin/PaymentSuccessModal";
@@ -19,6 +19,7 @@ type FeeType = {
   studyMode?: string;
   allCampuses?: boolean;
   allStudyModes?: boolean;
+  nationalityGroup?: string;
   term?: string;
 };
 
@@ -43,6 +44,7 @@ export default function MakePaymentForm() {
 
   const student = data?.students?.[0];
   const allFeeTypes = (data?.feeTypes ?? []) as FeeType[];
+  const currency = getCurrency(student?.nationalityGroup);
 
   // Filter fee types by student's school/class and selected term
   const matchingFeeTypes = useMemo(() => {
@@ -54,6 +56,7 @@ export default function MakePaymentForm() {
       if (student.schoolType === VSEC_SCHOOL) {
         if (!ft.allCampuses && ft.campus !== student.campus) return false;
         if (!ft.allStudyModes && ft.studyMode !== student.studyMode) return false;
+        if (ft.nationalityGroup !== student.nationalityGroup) return false;
       }
       return true;
     });
@@ -94,7 +97,7 @@ export default function MakePaymentForm() {
       return;
     }
     if (amount > remainingBalance) {
-      setError(`Amount cannot exceed the remaining balance of ${formatCurrency(remainingBalance)}.`);
+      setError(`Amount cannot exceed the remaining balance of ${formatCurrency(remainingBalance, currency)}.`);
       return;
     }
     if (remainingBalance <= 0) {
@@ -120,6 +123,7 @@ export default function MakePaymentForm() {
             term: selectedTerm,
             feeName: selectedFeeType.feeName ?? "",
             feeAmount: selectedFeeType.amount ?? 0,
+            currency,
             createdAt: now,
           })
           .link({ feeType: selectedFeeType.id }),
@@ -139,6 +143,7 @@ export default function MakePaymentForm() {
         balance: newBalance,
         paymentMethod,
         paymentDate: now,
+        currency,
       });
 
       // Reset form
@@ -214,11 +219,11 @@ export default function MakePaymentForm() {
                       <div>
                         <p className="text-sm font-medium text-gray-800">{ft.feeName}</p>
                         <p className="text-xs text-gray-400 mt-0.5">
-                          {bal <= 0 ? "Fully paid" : `Balance: ${formatCurrency(bal)}`}
+                          {bal <= 0 ? "Fully paid" : `Balance: ${formatCurrency(bal, currency)}`}
                         </p>
                       </div>
                       <span className="text-sm font-bold text-gray-700">
-                        {formatCurrency(ft.amount ?? 0)}
+                        {formatCurrency(ft.amount ?? 0, currency)}
                       </span>
                     </button>
                   );
@@ -234,7 +239,7 @@ export default function MakePaymentForm() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
               <p className="text-xs text-blue-600 font-medium">Remaining Balance</p>
               <p className="text-xl font-bold text-blue-800 mt-0.5">
-                {formatCurrency(remainingBalance)}
+                {formatCurrency(remainingBalance, currency)}
               </p>
             </div>
 
@@ -242,7 +247,7 @@ export default function MakePaymentForm() {
               <h3 className="text-sm font-semibold text-gray-700 mb-3">3. Amount to Pay</h3>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">
-                  GHS
+                  {currency === "USD" ? "$" : "GHS"}
                 </span>
                 <input
                   type="number"

@@ -1,16 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useStudentPaymentSummary } from "../../hooks/useStudentPaymentSummary";
-import { VSEC_SCHOOL } from "../../lib/constants";
+import { VSEC_SCHOOL, getCurrency } from "../../lib/constants";
 import SummaryCards from "../../components/student/SummaryCards";
 import RecentPaymentsList from "../../components/student/RecentPaymentsList";
 
 export default function HomePage() {
   const { session } = useAuth();
   const navigate = useNavigate();
-  const { isLoading, summary, payments } = useStudentPaymentSummary(
+  const { isLoading, summary, payments, currency } = useStudentPaymentSummary(
     session?.id ?? ""
   );
+  const resolvedCurrency = currency ?? getCurrency(session?.nationalityGroup);
 
   const sortedPayments = [...payments].sort(
     (a, b) => (b.paymentDate ?? 0) - (a.paymentDate ?? 0)
@@ -36,6 +37,11 @@ export default function HomePage() {
               {session.studyMode}
             </span>
           )}
+          {session?.schoolType === VSEC_SCHOOL && session?.nationalityGroup && (
+            <span className="bg-blue-500/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+              {session.nationalityGroup}
+            </span>
+          )}
           <span className="bg-blue-500/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
             {session?.classLevel}
           </span>
@@ -57,6 +63,7 @@ export default function HomePage() {
           totalDue={summary.totalDue}
           totalPaid={summary.totalPaid}
           balance={summary.balance}
+          currency={resolvedCurrency}
         />
       ) : null}
 
@@ -75,6 +82,7 @@ export default function HomePage() {
       <RecentPaymentsList
         payments={sortedPayments}
         onViewAll={() => navigate("/student/history")}
+        currency={resolvedCurrency}
       />
     </div>
   );

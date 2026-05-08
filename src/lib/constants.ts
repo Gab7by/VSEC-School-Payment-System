@@ -50,3 +50,10 @@ export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 export const ALL_CLASSES_LABEL = "All Classes";
 export const ALL_CAMPUSES_LABEL = "All Campuses";
 export const ALL_STUDY_MODES_LABEL = "All Study Modes";
+
+export const VSEC_NATIONALITY_GROUPS = ["Ghanaian", "International"] as const;
+export type VsecNationalityGroup = (typeof VSEC_NATIONALITY_GROUPS)[number];
+
+export function getCurrency(nationalityGroup?: string): "GHS" | "USD" {
+  return nationalityGroup === "International" ? "USD" : "GHS";
+}

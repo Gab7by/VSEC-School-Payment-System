@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../lib/db";
 import { formatCurrency, formatDate } from "../../lib/utils";
+import { getCurrency } from "../../lib/constants";
 import ReceiptPrint, { triggerPrint, type ReceiptData } from "../../components/admin/ReceiptPrint";
 
 export default function HistoryPage() {
@@ -20,6 +21,7 @@ export default function HistoryPage() {
 
   const student = data?.students?.[0];
   const payments = student?.payments ?? [];
+  const currency = getCurrency(student?.nationalityGroup ?? session?.nationalityGroup);
 
   function handleDownload(payment: typeof payments[number]) {
     const ft = payment.feeType as { amount?: number } | undefined;
@@ -36,6 +38,7 @@ export default function HistoryPage() {
       balance: payment.balance ?? 0,
       paymentMethod: payment.paymentMethod ?? "",
       paymentDate: payment.paymentDate ?? Date.now(),
+      currency: (payment.currency as "GHS" | "USD") ?? currency,
     };
     setSelectedReceipt(receipt);
     // Small delay to allow the receipt component to render before printing
@@ -84,11 +87,11 @@ export default function HistoryPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-base font-bold text-green-700">
-                    {formatCurrency(p.amountPaid ?? 0)}
+                    {formatCurrency(p.amountPaid ?? 0, (p.currency as "GHS" | "USD") ?? currency)}
                   </p>
                   {(p.balance ?? 0) > 0 && (
                     <p className="text-xs text-red-500 mt-0.5">
-                      Bal: {formatCurrency(p.balance ?? 0)}
+                      Bal: {formatCurrency(p.balance ?? 0, (p.currency as "GHS" | "USD") ?? currency)}
                     </p>
                   )}
                   <button

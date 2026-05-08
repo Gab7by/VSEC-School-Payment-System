@@ -32,11 +32,11 @@ export function generateTransactionId(): string {
   return `TXN-${timestamp}-${suffix}`;
 }
 
-export function formatCurrency(amount: number): string {
-  return `GHS ${amount.toLocaleString("en-GH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+export function formatCurrency(amount: number, currency: "GHS" | "USD" = "GHS"): string {
+  if (currency === "USD") {
+    return `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return `GHS ${amount.toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export function formatDate(timestamp: number): string {

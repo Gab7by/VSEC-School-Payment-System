@@ -102,13 +102,13 @@ export default function PaymentsPage() {
                         {payment.term} Term
                       </td>
                       <td className="px-4 py-3 text-right text-gray-700">
-                        {formatCurrency(payment.feeAmount ?? 0)}
+                        {formatCurrency(payment.feeAmount ?? 0, (payment.currency as "GHS" | "USD") ?? "GHS")}
                       </td>
                       <td className="px-4 py-3 text-right text-green-700 font-medium">
-                        {formatCurrency(payment.amountPaid ?? 0)}
+                        {formatCurrency(payment.amountPaid ?? 0, (payment.currency as "GHS" | "USD") ?? "GHS")}
                       </td>
                       <td className={`px-4 py-3 text-right font-medium ${(payment.balance ?? 0) > 0 ? "text-red-600" : "text-gray-500"}`}>
-                        {formatCurrency(payment.balance ?? 0)}
+                        {formatCurrency(payment.balance ?? 0, (payment.currency as "GHS" | "USD") ?? "GHS")}
                       </td>
                       <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                         {payment.paymentMethod}

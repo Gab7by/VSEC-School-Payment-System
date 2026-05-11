@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
+import { usePaystackPayment } from "react-paystack";
 import { db } from "../../lib/db";
 import { id } from "@instantdb/react";
-import { generateTransactionId, formatCurrency } from "../../lib/utils";
-import { TERMS, PAYMENT_METHODS, VSEC_SCHOOL, getCurrency, type Term, type PaymentMethod } from "../../lib/constants";
+import { formatCurrency } from "../../lib/utils";
+import { TERMS, VSEC_SCHOOL, getCurrency, type Term } from "../../lib/constants";
 import { useAuth } from "../../context/AuthContext";
-import Button from "../ui/Button";
 import PaymentSuccessModal from "../admin/PaymentSuccessModal";
 import type { ReceiptData } from "../admin/ReceiptPrint";
 
@@ -42,9 +42,8 @@ export default function MakePaymentForm() {
   const [selectedTerm, setSelectedTerm] = useState<Term | "">("");
   const [selectedFeeTypeId, setSelectedFeeTypeId] = useState("");
   const [amountToPay, setAmountToPay] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [paystackError, setPaystackError] = useState("");
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
 
   const { data } = db.useQuery({
@@ -90,85 +89,83 @@ export default function MakePaymentForm() {
     ? Math.max(0, (selectedFeeType.amount ?? 0) - paidForSelectedFee)
     : 0;
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
+  const amountNum = parseFloat(amountToPay || "0");
 
-    if (!selectedTerm || !selectedFeeTypeId || !amountToPay || !paymentMethod) {
-      setError("Please complete all fields.");
-      return;
-    }
+  // Must be called unconditionally at top level (React rules of hooks)
+  const initializePayment = usePaystackPayment({
+    reference: new Date().getTime().toString(),
+    email: session?.email ?? "",
+    amount: Math.round(amountNum * 100),
+    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string,
+    currency: currency === "USD" ? "USD" : "GHS",
+  });
+
+  function handlePayWithPaystack() {
+    setPaystackError("");
     if (!selectedFeeType || !session || !student) return;
-
     const amount = parseFloat(amountToPay);
-    if (isNaN(amount) || amount <= 0) {
-      setError("Please enter a valid amount.");
-      return;
-    }
-    if (amount > remainingBalance) {
-      setError(`Amount cannot exceed the remaining balance of ${formatCurrency(remainingBalance, currency)}.`);
-      return;
-    }
-    if (remainingBalance <= 0) {
-      setError("This fee is already fully paid.");
-      return;
-    }
+    if (isNaN(amount) || amount <= 0 || amount > remainingBalance) return;
 
-    setLoading(true);
-    try {
-      const transactionId = generateTransactionId();
-      const now = Date.now();
-      const newBalance = Math.max(0, remainingBalance - amount);
-      const newPaymentId = id();
+    initializePayment({
+      onSuccess: async (response: { reference: string }) => {
+        setLoading(true);
+        try {
+          const now = Date.now();
+          const newBalance = Math.max(0, remainingBalance - amount);
+          const newPaymentId = id();
 
-      await db.transact([
-        db.tx.payments[newPaymentId]
-          .update({
-            transactionId,
+          await db.transact([
+            db.tx.payments[newPaymentId]
+              .update({
+                transactionId: response.reference,
+                amountPaid: amount,
+                balance: newBalance,
+                paymentMethod: "Paystack",
+                paymentDate: now,
+                term: selectedTerm,
+                feeName: selectedFeeType.feeName ?? "",
+                feeAmount: selectedFeeType.amount ?? 0,
+                currency,
+                createdAt: now,
+              })
+              .link({ feeType: selectedFeeType.id }),
+            db.tx.students[session.id].link({ payments: newPaymentId }),
+          ]);
+
+          setReceiptData({
+            transactionId: response.reference,
+            studentName: student.fullName ?? session.name,
+            studentId: student.studentId ?? session.studentId ?? "",
+            schoolType: student.schoolType ?? session.schoolType ?? "",
+            classLevel: student.classLevel ?? session.classLevel ?? "",
+            feeName: selectedFeeType.feeName ?? "",
+            term: selectedTerm as Term,
+            feeAmount: selectedFeeType.amount ?? 0,
             amountPaid: amount,
             balance: newBalance,
-            paymentMethod,
+            paymentMethod: "Paystack",
             paymentDate: now,
-            term: selectedTerm,
-            feeName: selectedFeeType.feeName ?? "",
-            feeAmount: selectedFeeType.amount ?? 0,
             currency,
-            createdAt: now,
-          })
-          .link({ feeType: selectedFeeType.id }),
-        db.tx.students[session.id].link({ payments: newPaymentId }),
-      ]);
+          });
 
-      setReceiptData({
-        transactionId,
-        studentName: student.fullName ?? session.name,
-        studentId: student.studentId ?? session.studentId ?? "",
-        schoolType: student.schoolType ?? session.schoolType ?? "",
-        classLevel: student.classLevel ?? session.classLevel ?? "",
-        feeName: selectedFeeType.feeName ?? "",
-        term: selectedTerm,
-        feeAmount: selectedFeeType.amount ?? 0,
-        amountPaid: amount,
-        balance: newBalance,
-        paymentMethod,
-        paymentDate: now,
-        currency,
-      });
-
-      setSelectedTerm("");
-      setSelectedFeeTypeId("");
-      setAmountToPay("");
-      setPaymentMethod("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+          setSelectedTerm("");
+          setSelectedFeeTypeId("");
+          setAmountToPay("");
+        } catch {
+          setPaystackError("Payment received but failed to record. Please contact admin.");
+        } finally {
+          setLoading(false);
+        }
+      },
+      onClose: () => {
+        setPaystackError("Payment was cancelled.");
+      },
+    });
   }
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-6">
 
         {/* Step 1: Term */}
         <div>
@@ -245,7 +242,7 @@ export default function MakePaymentForm() {
           </div>
         )}
 
-        {/* Steps 3 & 4: Amount + Method */}
+        {/* Step 3: Amount + Pay button */}
         {selectedFeeTypeId && remainingBalance > 0 && (
           <>
             {/* Remaining balance box */}
@@ -271,7 +268,10 @@ export default function MakePaymentForm() {
                   max={remainingBalance}
                   step="0.01"
                   value={amountToPay}
-                  onChange={(e) => setAmountToPay(e.target.value)}
+                  onChange={(e) => {
+                    setAmountToPay(e.target.value);
+                    setPaystackError("");
+                  }}
                   placeholder="0.00"
                   className="w-full border border-slate-300 rounded-xl py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent ring-offset-1 transition-shadow placeholder:text-slate-400"
                   style={{
@@ -282,54 +282,31 @@ export default function MakePaymentForm() {
               </div>
             </div>
 
-            <div>
-              <StepHeader num={4} label="Payment Method" />
-              <div className="grid grid-cols-2 gap-3">
-                {PAYMENT_METHODS.map((method) => (
-                  <button
-                    key={method}
-                    type="button"
-                    onClick={() => setPaymentMethod(method)}
-                    className="py-4 rounded-xl border-2 text-sm font-semibold flex flex-col items-center gap-2 transition-all"
-                    style={
-                      paymentMethod === method
-                        ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "white", boxShadow: "0 4px 12px rgba(11,61,145,0.3)" }
-                        : { background: "white", borderColor: "#e2e8f0", color: "#475569" }
-                    }
-                  >
-                    {method === "Mobile Money" ? (
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-                      </svg>
-                    )}
-                    {method}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {paystackError && (
+              <p className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5">
+                {paystackError}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={handlePayWithPaystack}
+              disabled={loading || !amountToPay || amountNum <= 0 || amountNum > remainingBalance}
+              className="w-full py-3.5 rounded-xl font-semibold text-base text-white flex items-center justify-center gap-2.5 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              style={{ background: "#0BA4DB", boxShadow: "0 4px 14px rgba(11,164,219,0.35)" }}
+            >
+              {loading ? (
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+              )}
+              {loading ? "Processing…" : "Pay with Paystack →"}
+            </button>
           </>
         )}
-
-        {error && (
-          <p className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5">
-            {error}
-          </p>
-        )}
-
-        {selectedFeeTypeId && remainingBalance > 0 && (
-          <Button
-            type="submit"
-            loading={loading}
-            className="w-full py-3.5 text-base font-semibold rounded-xl"
-          >
-            Confirm Payment
-          </Button>
-        )}
-      </form>
+      </div>
 
       {receiptData && (
         <PaymentSuccessModal

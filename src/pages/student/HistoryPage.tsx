@@ -1,14 +1,12 @@
-import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../lib/db";
 import { formatCurrency, formatDate } from "../../lib/utils";
 import { getCurrency } from "../../lib/constants";
-import ReceiptPrint, { triggerPrint, type ReceiptData } from "../../components/admin/ReceiptPrint";
+import type { ReceiptData } from "../../components/admin/ReceiptPrint";
+import { downloadReceiptPDF } from "../../lib/receiptPdf";
 
 export default function HistoryPage() {
   const { session } = useAuth();
-  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
-
   const { data, isLoading } = db.useQuery({
     students: {
       $: { where: { id: session?.id ?? "" } },
@@ -40,8 +38,7 @@ export default function HistoryPage() {
       paymentDate: payment.paymentDate ?? Date.now(),
       currency: (payment.currency as "GHS" | "USD") ?? currency,
     };
-    setSelectedReceipt(receipt);
-    setTimeout(() => triggerPrint(() => setSelectedReceipt(null)), 100);
+    downloadReceiptPDF(receipt);
   }
 
   return (
@@ -117,7 +114,6 @@ export default function HistoryPage() {
         </div>
       )}
 
-      <ReceiptPrint data={selectedReceipt} />
     </div>
   );
 }

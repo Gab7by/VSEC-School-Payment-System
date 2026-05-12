@@ -192,7 +192,7 @@ export default function StudentsPage() {
         )}
       </div>
 
-      {showAdd && <AddStudentModal onClose={() => setShowAdd(false)} />}
+      {showAdd && <AddStudentModal existingStudents={students} onClose={() => setShowAdd(false)} />}
       {editStudent && (
         <ChangeClassModal
           student={editStudent}

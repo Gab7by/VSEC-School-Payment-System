@@ -23,10 +23,13 @@ import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
 
-type Props = { onClose: () => void };
+type Props = {
+  onClose: () => void;
+  existingStudents: Array<{ studentId?: string; schoolType?: string }>;
+};
 type Step = "form" | "success";
 
-export default function AddStudentModal({ onClose }: Props) {
+export default function AddStudentModal({ onClose, existingStudents }: Props) {
   const [step, setStep] = useState<Step>("form");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,8 +41,13 @@ export default function AddStudentModal({ onClose }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
-  const [studentId] = useState(() => generateStudentId());
   const [copied, setCopied] = useState(false);
+
+  const studentId = useMemo(() => {
+    if (!schoolType || !classLevel) return "";
+    if (schoolType === VSEC_SCHOOL && !nationalityGroup) return "";
+    return generateStudentId(schoolType, nationalityGroup || undefined, classLevel, existingStudents);
+  }, [schoolType, nationalityGroup, classLevel, existingStudents]);
 
   const isVsec = schoolType === VSEC_SCHOOL;
 
@@ -52,7 +60,7 @@ export default function AddStudentModal({ onClose }: Props) {
     e.preventDefault();
     setError("");
 
-    if (!fullName.trim() || !email.trim() || !schoolType || !classLevel) {
+    if (!fullName.trim() || !email.trim() || !schoolType || !classLevel || !studentId) {
       setError("All fields are required.");
       return;
     }
@@ -200,9 +208,16 @@ export default function AddStudentModal({ onClose }: Props) {
           </label>
           <input
             readOnly
-            value={studentId}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500 font-mono"
+            value={studentId || "—"}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 font-mono text-gray-700"
           />
+          {!studentId && schoolType && (
+            <p className="text-xs text-gray-400 mt-1">
+              {schoolType === VSEC_SCHOOL
+                ? "Select nationality group and class level to generate ID"
+                : "Select class level to generate ID"}
+            </p>
+          )}
         </div>
 
         <Select

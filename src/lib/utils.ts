@@ -6,10 +6,44 @@ export async function hashPassword(password: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function generateStudentId(): string {
-  const year = new Date().getFullYear();
-  const num = Math.floor(1000 + Math.random() * 9000);
-  return `VSEC-${year}-${num}`;
+const VSEC_LANGUAGE_LEVELS = new Set([
+  "Beginners (A1&A2)",
+  "Transition Level (Upper A2)",
+  "Intermediate Level (B1&B2)",
+  "Advanced Level (C1&C2)",
+  "Professional Level",
+]);
+
+function getVsecCourseCode(nationalityGroup: string | undefined, classLevel: string): string {
+  if (classLevel === "Standardized Test (IELTS/TOEFL)") return "03";
+  if (classLevel === "Computer Training") return "05";
+  if (classLevel === "Adult Senior High School") return "04";
+  if (VSEC_LANGUAGE_LEVELS.has(classLevel))
+    return nationalityGroup === "International" ? "02" : "01";
+  return "01";
+}
+
+export function generateStudentId(
+  schoolType: string,
+  nationalityGroup: string | undefined,
+  classLevel: string,
+  existingStudents: Array<{ studentId?: string; schoolType?: string }>
+): string {
+  const year = String(new Date().getFullYear());
+  if (schoolType === "VSEC College of Studies") {
+    const prefix = year + getVsecCourseCode(nationalityGroup, classLevel);
+    const nums = existingStudents
+      .filter((s) => s.studentId?.startsWith(prefix) && s.studentId.length === 10)
+      .map((s) => parseInt(s.studentId!.slice(6), 10))
+      .filter((n) => !isNaN(n));
+    return prefix + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(4, "0");
+  } else {
+    const nums = existingStudents
+      .filter((s) => s.schoolType === schoolType && s.studentId?.startsWith(year) && s.studentId.length === 8)
+      .map((s) => parseInt(s.studentId!.slice(4), 10))
+      .filter((n) => !isNaN(n));
+    return year + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(4, "0");
+  }
 }
 
 // Excludes visually ambiguous characters: 0/O, 1/l/I

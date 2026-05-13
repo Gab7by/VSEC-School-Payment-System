@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, #1a52b3 100%)" }}
+      style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%)" }}
     >
       <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-10" style={{ background: "var(--color-secondary)" }} />
       <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-5 bg-white" />

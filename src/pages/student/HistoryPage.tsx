@@ -67,8 +67,8 @@ export default function HistoryPage() {
             return (
               <div
                 key={p.id}
-                className="bg-white border border-slate-100 rounded-xl px-4 py-4 hover:shadow-sm transition-all"
-                onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "rgba(11,61,145,0.2)")}
+                className="bg-white border border-slate-100 rounded-xl px-3 py-3 sm:px-4 sm:py-4 hover:shadow-sm transition-all"
+                onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "rgba(212,175,55,0.4)")}
                 onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "")}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -86,7 +86,7 @@ export default function HistoryPage() {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-base font-bold text-emerald-600">
+                    <p className="text-sm sm:text-base font-bold text-emerald-600">
                       {formatCurrency(p.amountPaid ?? 0, paymentCurrency)}
                     </p>
                     {(p.balance ?? 0) > 0 && (
@@ -97,9 +97,9 @@ export default function HistoryPage() {
                     <button
                       onClick={() => handleDownload(p)}
                       className="mt-2 text-xs font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg transition-colors"
-                      style={{ color: "var(--color-primary)", background: "rgba(11,61,145,0.06)" }}
-                      onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(11,61,145,0.12)")}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(11,61,145,0.06)")}
+                      style={{ color: "var(--color-primary-dark)", background: "rgba(212,175,55,0.08)" }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(212,175,55,0.18)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "rgba(212,175,55,0.08)")}
                     >
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

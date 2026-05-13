@@ -129,15 +129,15 @@ export default function DashboardPage() {
       {/* Filter info banner */}
       <div
         className="rounded-xl px-4 py-3 border text-sm"
-        style={{ background: "rgba(11,61,145,0.04)", borderColor: "rgba(11,61,145,0.15)" }}
+        style={{ background: "rgba(212,175,55,0.06)", borderColor: "rgba(212,175,55,0.25)" }}
       >
         {filter === "All" ? (
-          <p style={{ color: "rgba(11,61,145,0.75)" }}>
+          <p style={{ color: "var(--color-primary-dark)" }}>
             International student fees (USD) are excluded from these totals — select{" "}
             <strong>VSEC — International</strong> to view USD statistics.
           </p>
         ) : (
-          <p style={{ color: "rgba(11,61,145,0.75)" }}>
+          <p style={{ color: "var(--color-primary-dark)" }}>
             Showing statistics for <strong>{filter}</strong> students only.
             {filter === "VSEC — International" && (
               <span className="ml-1">Amounts in <strong>USD ($)</strong>.</span>

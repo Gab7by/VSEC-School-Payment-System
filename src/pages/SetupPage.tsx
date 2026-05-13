@@ -57,7 +57,7 @@ export default function SetupPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, #1a52b3 100%)" }}
+      style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%)" }}
     >
       {/* Decorative circles */}
       <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-10" style={{ background: "var(--color-secondary)" }} />
@@ -78,7 +78,7 @@ export default function SetupPage() {
 
         <div
           className="rounded-xl px-4 py-3.5 mb-6 border"
-          style={{ background: "rgba(11,61,145,0.05)", borderColor: "rgba(11,61,145,0.2)" }}
+          style={{ background: "rgba(212,175,55,0.06)", borderColor: "rgba(212,175,55,0.25)" }}
         >
           <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>First-time Setup</p>
           <p className="text-sm mt-0.5 text-slate-600">
@@ -114,7 +114,7 @@ export default function SetupPage() {
             type="submit"
             disabled={loading}
             className="w-full text-white py-2.5 rounded-xl font-semibold disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-lg transition-all duration-150"
-            style={{ background: "var(--color-primary)", boxShadow: "0 4px 14px rgba(11,61,145,0.4)" }}
+            style={{ background: "var(--color-primary)", boxShadow: "0 4px 14px rgba(212,175,55,0.4)" }}
           >
             {loading ? (
               <span className="flex items-center gap-2 justify-center">

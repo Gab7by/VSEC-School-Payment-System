@@ -21,39 +21,34 @@ export default function HomePage() {
     <div className="space-y-6">
       {/* Welcome header — navy gradient card */}
       <div
-        className="rounded-2xl p-6 relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 60%, #1a52b3 100%)" }}
+        className="rounded-2xl p-4 sm:p-6 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 60%, var(--color-primary-light) 100%)" }}
       >
-        
-        
-        
-       
-
-        <p className="text-blue-200 text-sm font-medium relative">Welcome back,</p>
-        <h2 className="text-3xl font-bold text-white mt-0.5 relative">{session?.name}</h2>
+        <p className="text-amber-900 text-sm font-medium relative">Welcome back,</p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-0.5 relative">{session?.name}</h2>
         <div className="flex flex-wrap gap-2 mt-4 relative">
-          <span className="bg-white/15 text-white/90 text-xs px-3 py-1 rounded-full border border-white/10">
+          <span className="bg-black/10 text-slate-900 text-xs px-3 py-1 rounded-full border border-black/10">
             {session?.schoolType === VSEC_SCHOOL ? "VSEC College" : session?.schoolType}
           </span>
           {session?.schoolType === VSEC_SCHOOL && session?.campus && (
-            <span className="bg-white/15 text-white/90 text-xs px-3 py-1 rounded-full border border-white/10">
+            <span className="bg-black/10 text-slate-900 text-xs px-3 py-1 rounded-full border border-black/10">
               {session.campus}
             </span>
           )}
           {session?.schoolType === VSEC_SCHOOL && session?.studyMode && (
-            <span className="bg-white/15 text-white/90 text-xs px-3 py-1 rounded-full border border-white/10">
+            <span className="bg-black/10 text-slate-900 text-xs px-3 py-1 rounded-full border border-black/10">
               {session.studyMode}
             </span>
           )}
           {session?.schoolType === VSEC_SCHOOL && session?.nationalityGroup && (
-            <span className="bg-white/15 text-white/90 text-xs px-3 py-1 rounded-full border border-white/10">
+            <span className="bg-black/10 text-slate-900 text-xs px-3 py-1 rounded-full border border-black/10">
               {session.nationalityGroup}
             </span>
           )}
-          <span className="bg-white/15 text-white/90 text-xs px-3 py-1 rounded-full border border-white/10">
+          <span className="bg-black/10 text-slate-900 text-xs px-3 py-1 rounded-full border border-black/10">
             {session?.classLevel}
           </span>
-          <span className="bg-white/15 text-white/90 text-xs px-3 py-1 rounded-full border border-white/10 font-mono">
+          <span className="bg-black/10 text-slate-900 text-xs px-3 py-1 rounded-full border border-black/10 font-mono">
             {session?.studentId}
           </span>
         </div>
@@ -61,9 +56,9 @@ export default function HomePage() {
 
       {/* Summary cards */}
       {isLoading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-24 bg-slate-100 rounded-2xl animate-pulse" />
+            <div key={i} className="h-20 sm:h-24 bg-slate-100 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : summary ? (
@@ -81,7 +76,7 @@ export default function HomePage() {
         className="w-full text-white py-3.5 rounded-xl font-semibold text-base flex items-center justify-center gap-2.5 transition-all hover:-translate-y-0.5"
         style={{
           background: "var(--color-secondary)",
-          boxShadow: "0 4px 16px rgba(212,175,55,0.4)",
+          boxShadow: "0 4px 16px rgba(11,61,145,0.4)",
         }}
         onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-secondary-dark)")}
         onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-secondary)")}

@@ -67,15 +67,15 @@ export default function AdminLayout() {
       >
         {/* Logo area */}
         <div
-          className="flex items-center gap-3 px-5 py-5 border-b border-white/10"
+          className="flex items-center gap-3 px-5 py-5 border-b border-black/10"
           style={{ background: "var(--color-primary-dark)" }}
         >
           <div className="animate-logo-pulse shrink-0 rounded-full overflow-hidden bg-white w-10 h-10 flex items-center justify-center">
             <img src="/vsec-logo.png" alt="VSEC" className="w-10 h-10 object-contain" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white leading-none">VSEC School</p>
-            <p className="text-xs text-white/50 mt-0.5">Admin Portal</p>
+            <p className="text-sm font-bold text-slate-900 leading-none">VSEC School</p>
+            <p className="text-xs text-slate-600 mt-0.5">Admin Portal</p>
           </div>
         </div>
 
@@ -87,8 +87,8 @@ export default function AdminLayout() {
               onClick={() => { navigate(`/admin/${key}`); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                 isActive(key)
-                  ? "text-white border-l-2"
-                  : "text-white/60 hover:text-white hover:bg-white/10"
+                  ? "text-slate-900 border-l-2"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-black/10"
               }`}
               style={isActive(key) ? {
                 background: "rgba(255,255,255,0.12)",
@@ -104,10 +104,10 @@ export default function AdminLayout() {
         </nav>
 
         {/* Admin info at bottom */}
-        <div className="px-3 py-4 border-t border-white/10">
-          <div className="rounded-xl px-3 py-2.5" style={{ background: "rgba(0,0,0,0.2)" }}>
-            <p className="text-xs font-semibold text-white/80 truncate">{session?.name}</p>
-            <p className="text-xs text-white/40 truncate mt-0.5">{session?.email}</p>
+        <div className="px-3 py-4 border-t border-black/10">
+          <div className="rounded-xl px-3 py-2.5" style={{ background: "rgba(0,0,0,0.12)" }}>
+            <p className="text-xs font-semibold text-slate-900 truncate">{session?.name}</p>
+            <p className="text-xs text-slate-600 truncate mt-0.5">{session?.email}</p>
           </div>
         </div>
       </aside>
@@ -115,7 +115,7 @@ export default function AdminLayout() {
       {/* Sidebar backdrop (mobile) */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-primary/80 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -146,7 +146,7 @@ export default function AdminLayout() {
             >
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                style={{ background: "var(--color-primary)" }}
+                style={{ background: "var(--color-secondary)" }}
               >
                 {session?.name?.[0]?.toUpperCase()}
               </div>

@@ -45,7 +45,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, #1a52b3 100%)" }}
+      style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%)" }}
     >
       {/* Decorative circles */}
       <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-10" style={{ background: "var(--color-secondary)" }} />
@@ -95,7 +95,7 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className="w-full text-white py-2.5 rounded-xl font-semibold disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 hover:-translate-y-0.5 shadow-lg transition-all duration-150"
-            style={{ background: "var(--color-primary)", boxShadow: "0 4px 14px rgba(11,61,145,0.4)" }}
+            style={{ background: "var(--color-primary)", boxShadow: "0 4px 14px rgba(212,175,55,0.4)" }}
           >
             {loading ? (
               <span className="flex items-center gap-2 justify-center">

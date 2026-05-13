@@ -117,7 +117,7 @@ export default function StudentsPage() {
                     key={student.id}
                     className="transition-colors"
                     style={{}}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(11,61,145,0.03)")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(212,175,55,0.06)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                   >
                     <td className="px-5 py-3.5 font-mono text-xs text-slate-500 whitespace-nowrap">
@@ -133,7 +133,7 @@ export default function StudentsPage() {
                             ? "text-primary"
                             : "bg-teal-100 text-teal-700"
                         }`}
-                        style={student.schoolType === VSEC_SCHOOL ? { background: "rgba(11,61,145,0.1)", color: "var(--color-primary)" } : {}}
+                        style={student.schoolType === VSEC_SCHOOL ? { background: "rgba(212,175,55,0.12)", color: "var(--color-primary-dark)" } : {}}
                       >
                         {student.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
                       </span>

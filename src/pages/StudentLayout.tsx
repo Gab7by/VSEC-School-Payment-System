@@ -69,13 +69,13 @@ export default function StudentLayout() {
             <img src="/vsec-logo.png" alt="VSEC" className="w-10 h-10 object-contain" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white leading-none">VSEC School</p>
-            <p className="text-xs text-white/50">Student Portal</p>
+            <p className="text-sm font-bold text-slate-900 leading-none">VSEC School</p>
+            <p className="text-xs text-slate-600">Student Portal</p>
           </div>
         </div>
         <button
           onClick={logout}
-          className="flex items-center gap-1.5 text-xs text-white/70 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/10"
+          className="flex items-center gap-1.5 text-xs text-slate-700 hover:text-slate-900 transition-colors px-3 py-1.5 rounded-lg hover:bg-black/10"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -106,7 +106,7 @@ export default function ProfilePage() {
       {session?.isFirstLogin && (
         <div
           className="rounded-2xl p-4 flex gap-3 border"
-          style={{ background: "linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(251,191,36,0.06) 100%)", borderColor: "rgba(212,175,55,0.35)" }}
+          style={{ background: "linear-gradient(135deg, rgba(11,61,145,0.07) 0%, rgba(11,61,145,0.04) 100%)", borderColor: "rgba(11,61,145,0.2)" }}
         >
           <svg
             className="w-5 h-5 shrink-0 mt-0.5"

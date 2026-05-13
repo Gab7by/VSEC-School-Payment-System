@@ -43,7 +43,7 @@ export default function RecentPaymentsList({ payments, onViewAll, currency = "GH
             <div
               key={p.id}
               className="bg-white border border-slate-100 rounded-xl px-4 py-3.5 flex items-center justify-between gap-4 hover:shadow-sm transition-all"
-              onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "rgba(11,61,145,0.2)")}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "rgba(212,175,55,0.4)")}
               onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "")}
             >
               <div className="min-w-0">

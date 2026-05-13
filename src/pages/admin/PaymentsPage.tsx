@@ -169,7 +169,7 @@ export default function PaymentsPage() {
                     <tr
                       key={payment.id}
                       className="transition-colors"
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(11,61,145,0.03)")}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(212,175,55,0.06)")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                     >
                       <td className="px-5 py-3.5 font-mono text-xs text-slate-500 whitespace-nowrap">
@@ -199,7 +199,7 @@ export default function PaymentsPage() {
                       <td className="px-5 py-3.5 text-slate-600 whitespace-nowrap">
                         <span
                           className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium"
-                          style={{ background: "rgba(11,61,145,0.06)", color: "var(--color-primary)" }}
+                          style={{ background: "rgba(212,175,55,0.1)", color: "var(--color-primary-dark)" }}
                         >
                           {payment.paymentMethod}
                         </span>

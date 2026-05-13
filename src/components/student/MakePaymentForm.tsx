@@ -28,7 +28,7 @@ function StepHeader({ num, label }: { num: number; label: string }) {
     <div className="flex items-center gap-3 mb-3">
       <div
         className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-        style={{ background: "var(--color-secondary)", color: "var(--color-primary-dark)" }}
+        style={{ background: "var(--color-secondary)", color: "white" }}
       >
         {num}
       </div>
@@ -179,10 +179,10 @@ export default function MakePaymentForm() {
                   setSelectedTerm(t);
                   setSelectedFeeTypeId("");
                 }}
-                className="py-3 rounded-xl border text-sm font-semibold transition-all"
+                className="py-2.5 sm:py-3 rounded-xl border text-xs sm:text-sm font-semibold transition-all"
                 style={
                   selectedTerm === t
-                    ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "white", boxShadow: "0 2px 8px rgba(11,61,145,0.3)" }
+                    ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "white", boxShadow: "0 2px 8px rgba(212,175,55,0.3)" }
                     : { background: "white", borderColor: "#cbd5e1", color: "#475569" }
                 }
               >
@@ -221,7 +221,7 @@ export default function MakePaymentForm() {
                       className="w-full text-left flex items-center justify-between rounded-xl border-2 px-4 py-3.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       style={
                         isSelected
-                          ? { borderColor: "var(--color-primary)", background: "rgba(11,61,145,0.04)" }
+                          ? { borderColor: "var(--color-primary)", background: "rgba(212,175,55,0.04)" }
                           : { borderColor: "#e2e8f0", background: "white" }
                       }
                     >
@@ -247,11 +247,11 @@ export default function MakePaymentForm() {
           <>
             {/* Remaining balance box */}
             <div
-              className="rounded-xl px-4 py-3 border"
-              style={{ background: "rgba(11,61,145,0.04)", borderColor: "rgba(11,61,145,0.18)" }}
+              className="rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 border"
+              style={{ background: "rgba(212,175,55,0.06)", borderColor: "rgba(212,175,55,0.25)" }}
             >
-              <p className="text-xs font-medium" style={{ color: "rgba(11,61,145,0.7)" }}>Remaining Balance</p>
-              <p className="text-xl font-bold mt-0.5" style={{ color: "var(--color-primary)" }}>
+              <p className="text-xs font-medium" style={{ color: "var(--color-primary-dark)" }}>Remaining Balance</p>
+              <p className="text-lg sm:text-xl font-bold mt-0.5" style={{ color: "var(--color-primary-dark)" }}>
                 {formatCurrency(remainingBalance, currency)}
               </p>
             </div>
@@ -273,7 +273,7 @@ export default function MakePaymentForm() {
                     setPaystackError("");
                   }}
                   placeholder="0.00"
-                  className="w-full border border-slate-300 rounded-xl py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent ring-offset-1 transition-shadow placeholder:text-slate-400"
+                  className="w-full border border-slate-300 rounded-xl py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent ring-offset-1 transition-shadow placeholder:text-slate-400"
                   style={{
                     paddingLeft: currency === "USD" ? "2.5rem" : "3.5rem",
                     "--tw-ring-color": "var(--color-primary)",
@@ -292,7 +292,7 @@ export default function MakePaymentForm() {
               type="button"
               onClick={handlePayWithPaystack}
               disabled={loading || !amountToPay || amountNum <= 0 || amountNum > remainingBalance}
-              className="w-full py-3.5 rounded-xl font-semibold text-base text-white flex items-center justify-center gap-2.5 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="w-full py-3 sm:py-3.5 rounded-xl font-semibold text-base text-white flex items-center justify-center gap-2.5 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{ background: "#0BA4DB", boxShadow: "0 4px 14px rgba(11,164,219,0.35)" }}
             >
               {loading ? (

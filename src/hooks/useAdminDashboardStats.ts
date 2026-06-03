@@ -1,7 +1,13 @@
 import { db } from "../lib/db";
-import type { SchoolType } from "../lib/constants";
+import { VSEC_SCHOOL } from "../lib/constants";
 
-export function useAdminDashboardStats(filterSchoolType: SchoolType | "All") {
+export type DashboardFilter =
+  | "All"
+  | "VSEC — Ghanaian"
+  | "VSEC — International"
+  | "Donkor Kids Talent International School";
+
+export function useAdminDashboardStats(filter: DashboardFilter) {
   const { data, isLoading, error } = db.useQuery({
     students: { payments: {} },
     feeTypes: {},
@@ -13,17 +19,34 @@ export function useAdminDashboardStats(filterSchoolType: SchoolType | "All") {
 
   const { students, feeTypes } = data;
 
-  const filteredStudents =
-    filterSchoolType === "All"
-      ? students
-      : students.filter((s) => s.schoolType === filterSchoolType);
+  // Determine filtered students based on filter
+  let filteredStudents = students;
+  if (filter === "VSEC — Ghanaian") {
+    filteredStudents = students.filter(
+      (s) => s.schoolType === VSEC_SCHOOL && s.nationalityGroup === "Ghanaian"
+    );
+  } else if (filter === "VSEC — International") {
+    filteredStudents = students.filter(
+      (s) => s.schoolType === VSEC_SCHOOL && s.nationalityGroup === "International"
+    );
+  } else if (filter === "Donkor Kids Talent International School") {
+    filteredStudents = students.filter(
+      (s) => s.schoolType === "Donkor Kids Talent International School"
+    );
+  } else {
+    // "All" — exclude International students from monetary totals (currency mixing)
+    filteredStudents = students.filter((s) => s.nationalityGroup !== "International");
+  }
 
-  const filteredIds = new Set(filteredStudents.map((s) => s.id));
+  // Determine currency
+  const currency: "GHS" | "USD" = filter === "VSEC — International" ? "USD" : "GHS";
 
   // Collect all payments for filtered students
   let totalPaid = 0;
+  const filteredPaymentIds: string[] = [];
   for (const student of filteredStudents) {
     for (const payment of student.payments ?? []) {
+      filteredPaymentIds.push(payment.id);
       totalPaid += payment.amountPaid ?? 0;
     }
   }
@@ -31,11 +54,23 @@ export function useAdminDashboardStats(filterSchoolType: SchoolType | "All") {
   // Total revenue = sum of fee type amounts × number of matching students per fee type
   let totalRevenue = 0;
   for (const ft of feeTypes) {
-    if (filterSchoolType !== "All" && ft.schoolType !== filterSchoolType) continue;
+    // Skip fees that don't match the filter scope
+    if (filter === "VSEC — Ghanaian") {
+      if (ft.schoolType !== VSEC_SCHOOL || ft.nationalityGroup !== "Ghanaian") continue;
+    } else if (filter === "VSEC — International") {
+      if (ft.schoolType !== VSEC_SCHOOL || ft.nationalityGroup !== "International") continue;
+    } else if (filter === "Donkor Kids Talent International School") {
+      if (ft.schoolType !== "Donkor Kids Talent International School") continue;
+    } else {
+      // "All" — exclude International fees
+      if (ft.nationalityGroup === "International") continue;
+    }
+
     const matchingStudents = filteredStudents.filter(
       (s) =>
         s.schoolType === ft.schoolType &&
-        (ft.allClasses || s.classLevel === ft.classLevel)
+        (ft.allClasses || s.classLevel === ft.classLevel) &&
+        (s.schoolType !== VSEC_SCHOOL || s.nationalityGroup === ft.nationalityGroup)
     );
     totalRevenue += (ft.amount ?? 0) * matchingStudents.length;
   }
@@ -51,7 +86,8 @@ export function useAdminDashboardStats(filterSchoolType: SchoolType | "All") {
       totalRevenue,
       totalPaid,
       outstanding,
-      filteredIds,
+      filteredPaymentIds,
+      currency,
     },
   };
 }

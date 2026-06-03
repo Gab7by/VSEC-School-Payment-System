@@ -9,27 +9,47 @@ import {
 import {
   SCHOOL_TYPES,
   CLASS_LEVELS,
+  VSEC_SCHOOL,
+  VSEC_CAMPUSES,
+  VSEC_STUDY_MODES,
+  VSEC_NATIONALITY_GROUPS,
   type SchoolType,
+  type VsecCampus,
+  type VsecStudyMode,
+  type VsecNationalityGroup,
 } from "../../lib/constants";
 import Modal from "../ui/Modal";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
 
-type Props = { onClose: () => void };
+type Props = {
+  onClose: () => void;
+  existingStudents: Array<{ studentId?: string; schoolType?: string }>;
+};
 type Step = "form" | "success";
 
-export default function AddStudentModal({ onClose }: Props) {
+export default function AddStudentModal({ onClose, existingStudents }: Props) {
   const [step, setStep] = useState<Step>("form");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [schoolType, setSchoolType] = useState<SchoolType | "">("");
   const [classLevel, setClassLevel] = useState("");
+  const [campus, setCampus] = useState<VsecCampus | "">("");
+  const [studyMode, setStudyMode] = useState<VsecStudyMode | "">("");
+  const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
-  const [studentId] = useState(() => generateStudentId());
   const [copied, setCopied] = useState(false);
+
+  const studentId = useMemo(() => {
+    if (!schoolType || !classLevel) return "";
+    if (schoolType === VSEC_SCHOOL && !nationalityGroup) return "";
+    return generateStudentId(schoolType, nationalityGroup || undefined, classLevel, existingStudents);
+  }, [schoolType, nationalityGroup, classLevel, existingStudents]);
+
+  const isVsec = schoolType === VSEC_SCHOOL;
 
   const classOptions = useMemo(
     () => (schoolType ? CLASS_LEVELS[schoolType] : []),
@@ -40,8 +60,12 @@ export default function AddStudentModal({ onClose }: Props) {
     e.preventDefault();
     setError("");
 
-    if (!fullName.trim() || !email.trim() || !schoolType || !classLevel) {
+    if (!fullName.trim() || !email.trim() || !schoolType || !classLevel || !studentId) {
       setError("All fields are required.");
+      return;
+    }
+    if (isVsec && (!campus || !studyMode || !nationalityGroup)) {
+      setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
       return;
     }
 
@@ -58,6 +82,7 @@ export default function AddStudentModal({ onClose }: Props) {
           email: email.trim().toLowerCase(),
           schoolType,
           classLevel,
+          ...(isVsec ? { campus, studyMode, nationalityGroup } : {}),
           passwordHash: hash,
           isFirstLogin: true,
           createdAt: Date.now(),
@@ -103,12 +128,30 @@ export default function AddStudentModal({ onClose }: Props) {
               <span className="font-mono font-medium">{studentId}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">School Type</span>
-              <span className="font-medium">{schoolType}</span>
+              <span className="text-gray-500">School</span>
+              <span className="font-medium text-right max-w-[60%]">{schoolType}</span>
             </div>
+            {isVsec && campus && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Campus</span>
+                <span className="font-medium">{campus}</span>
+              </div>
+            )}
+            {isVsec && studyMode && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Study Mode</span>
+                <span className="font-medium">{studyMode}</span>
+              </div>
+            )}
+            {isVsec && nationalityGroup && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Nationality Group</span>
+                <span className="font-medium">{nationalityGroup}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-gray-500">Class</span>
-              <span className="font-medium">{classLevel}</span>
+              <span className="font-medium text-right max-w-[60%]">{classLevel}</span>
             </div>
           </div>
 
@@ -165,9 +208,16 @@ export default function AddStudentModal({ onClose }: Props) {
           </label>
           <input
             readOnly
-            value={studentId}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500 font-mono"
+            value={studentId || "—"}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 font-mono text-gray-700"
           />
+          {!studentId && schoolType && (
+            <p className="text-xs text-gray-400 mt-1">
+              {schoolType === VSEC_SCHOOL
+                ? "Select nationality group and class level to generate ID"
+                : "Select class level to generate ID"}
+            </p>
+          )}
         </div>
 
         <Select
@@ -176,6 +226,9 @@ export default function AddStudentModal({ onClose }: Props) {
           onChange={(e) => {
             setSchoolType(e.target.value as SchoolType);
             setClassLevel("");
+            setCampus("");
+            setStudyMode("");
+            setNationalityGroup("");
           }}
           placeholder="Select school type"
           disabled={loading}
@@ -185,8 +238,48 @@ export default function AddStudentModal({ onClose }: Props) {
           ))}
         </Select>
 
+        {isVsec && (
+          <>
+            <Select
+              label="Campus"
+              value={campus}
+              onChange={(e) => setCampus(e.target.value as VsecCampus)}
+              placeholder="Select campus"
+              disabled={loading}
+            >
+              {VSEC_CAMPUSES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </Select>
+
+            <Select
+              label="Study Mode"
+              value={studyMode}
+              onChange={(e) => setStudyMode(e.target.value as VsecStudyMode)}
+              placeholder="Select study mode"
+              disabled={loading}
+            >
+              {VSEC_STUDY_MODES.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </Select>
+
+            <Select
+              label="Nationality Group"
+              value={nationalityGroup}
+              onChange={(e) => setNationalityGroup(e.target.value as VsecNationalityGroup)}
+              placeholder="Select nationality group"
+              disabled={loading}
+            >
+              {VSEC_NATIONALITY_GROUPS.map((g) => (
+                <option key={g} value={g}>{g}</option>
+              ))}
+            </Select>
+          </>
+        )}
+
         <Select
-          label="Class"
+          label="Class Level"
           value={classLevel}
           onChange={(e) => setClassLevel(e.target.value)}
           placeholder="Select class"

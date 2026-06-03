@@ -1,19 +1,11 @@
 import { useEffect, type ReactElement } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import HomePage from "./student/HomePage";
-import StudentPaymentsPage from "./student/PaymentsPage";
-import HistoryPage from "./student/HistoryPage";
-import ProfilePage from "./student/ProfilePage";
 
-export type StudentSection = "home" | "payments" | "history" | "profile";
-
-type Props = {
-  currentSection: StudentSection;
-  onNavigate: (section: StudentSection) => void;
-};
+type StudentNavKey = "home" | "payments" | "history" | "profile";
 
 type NavItem = {
-  key: StudentSection;
+  key: StudentNavKey;
   label: string;
   icon: (active: boolean) => ReactElement;
 };
@@ -57,41 +49,33 @@ const navItems: NavItem[] = [
   },
 ];
 
-export default function StudentLayout({ currentSection, onNavigate }: Props) {
+export default function StudentLayout() {
   const { session, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Force first-login students to profile page
   useEffect(() => {
-    if (session?.isFirstLogin && currentSection !== "profile") {
-      onNavigate("profile");
+    if (session?.isFirstLogin && location.pathname !== "/student/profile") {
+      navigate("/student/profile", { replace: true });
     }
-  }, [session?.isFirstLogin, currentSection, onNavigate]);
-
-  const sectionComponents: Record<StudentSection, ReactElement> = {
-    home: <HomePage onNavigate={onNavigate} />,
-    payments: <StudentPaymentsPage />,
-    history: <HistoryPage />,
-    profile: <ProfilePage />,
-  };
+  }, [session?.isFirstLogin, location.pathname, navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-10 shadow-sm px-4 py-3 flex items-center justify-between" style={{ background: "var(--color-primary)" }}>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
+          <div className="animate-logo-pulse shrink-0 rounded-full overflow-hidden bg-white w-10 h-10 flex items-center justify-center">
+            <img src="/vsec-logo.png" alt="VSEC" className="w-10 h-10 object-contain" />
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-900 leading-none">VSEC School</p>
-            <p className="text-xs text-gray-400">Student Portal</p>
+            <p className="text-sm font-bold text-slate-900 leading-none">VSEC School</p>
+            <p className="text-xs text-slate-600">Student Portal</p>
           </div>
         </div>
         <button
           onClick={logout}
-          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50"
+          className="flex items-center gap-1.5 text-xs text-slate-700 hover:text-slate-900 transition-colors px-3 py-1.5 rounded-lg hover:bg-black/10"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -102,24 +86,33 @@ export default function StudentLayout({ currentSection, onNavigate }: Props) {
 
       {/* Main content */}
       <main className="flex-1 overflow-auto p-4 pb-24">
-        {sectionComponents[currentSection]}
+        <Outlet />
       </main>
 
       {/* Bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 z-10">
         <div className="flex">
           {navItems.map(({ key, label, icon }) => {
-            const active = currentSection === key;
+            const active = location.pathname === `/student/${key}`;
             return (
               <button
                 key={key}
-                onClick={() => onNavigate(key)}
-                className={`flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors ${
-                  active ? "text-blue-600" : "text-gray-400 hover:text-gray-600"
-                }`}
+                onClick={() => navigate(`/student/${key}`)}
+                className="flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors"
+                style={{ color: active ? "var(--color-primary)" : undefined }}
               >
-                {icon(active)}
-                <span className="text-xs font-medium">{label}</span>
+                <span className={active ? "" : "text-slate-400"}>
+                  {icon(active)}
+                </span>
+                <span className={`text-xs font-semibold ${active ? "" : "text-slate-400"}`}>
+                  {label}
+                </span>
+                {active && (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full animate-nav-dot"
+                    style={{ background: "var(--color-secondary)" }}
+                  />
+                )}
               </button>
             );
           })}

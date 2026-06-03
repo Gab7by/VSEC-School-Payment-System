@@ -11,19 +11,19 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300",
+    "bg-primary hover:bg-primary-dark text-white shadow-sm hover:shadow-md hover:-translate-y-px active:scale-[0.97] disabled:bg-primary/50 disabled:translate-y-0 disabled:shadow-sm",
   secondary:
-    "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 disabled:bg-gray-100",
+    "bg-secondary hover:bg-secondary-dark text-white shadow-sm hover:shadow-md hover:-translate-y-px active:scale-[0.97] disabled:bg-secondary/50 disabled:translate-y-0 disabled:shadow-sm",
   danger:
-    "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300",
+    "bg-rose-600 hover:bg-rose-700 text-white shadow-sm hover:shadow-md hover:-translate-y-px active:scale-[0.97] disabled:bg-rose-400 disabled:translate-y-0",
   ghost:
-    "bg-transparent text-gray-600 hover:bg-gray-100 disabled:opacity-50",
+    "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.97] disabled:opacity-50",
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-xs rounded",
-  md: "px-4 py-2 text-sm rounded-lg",
-  lg: "px-5 py-2.5 text-base rounded-lg",
+  sm: "px-3 py-1.5 text-xs rounded-lg",
+  md: "px-4 py-2 text-sm rounded-xl",
+  lg: "px-5 py-2.5 text-base rounded-xl",
 };
 
 export default function Button({
@@ -39,7 +39,7 @@ export default function Button({
     <button
       {...props}
       disabled={disabled || loading}
-      className={`font-medium transition-colors disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`font-semibold transition-all duration-150 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
     >
       {loading ? (
         <span className="flex items-center gap-2 justify-center">

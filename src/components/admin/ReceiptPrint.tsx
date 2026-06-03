@@ -14,6 +14,7 @@ export type ReceiptData = {
   balance: number;
   paymentMethod: string;
   paymentDate: number;
+  currency?: "GHS" | "USD";
 };
 
 type Props = {
@@ -97,9 +98,9 @@ export default function ReceiptPrint({ data, onAfterPrint }: Props) {
       <div className="space-y-1.5 mb-4">
         <Row label="Fee Name" value={data.feeName} />
         <Row label="Term" value={`${data.term} Term`} />
-        <Row label="Total Fee" value={formatCurrency(data.feeAmount)} />
-        <Row label="Amount Paid" value={formatCurrency(data.amountPaid)} />
-        <Row label="Balance" value={formatCurrency(data.balance)} />
+        <Row label="Total Fee" value={formatCurrency(data.feeAmount, data.currency ?? "GHS")} />
+        <Row label="Amount Paid" value={formatCurrency(data.amountPaid, data.currency ?? "GHS")} />
+        <Row label="Balance" value={formatCurrency(data.balance, data.currency ?? "GHS")} />
         <Row label="Payment Method" value={data.paymentMethod} />
       </div>
 

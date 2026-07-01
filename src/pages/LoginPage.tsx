@@ -19,7 +19,7 @@ const inputCls = "w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,13 +28,13 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    if (!email.trim() || !password) {
-      setError("Please enter your email and password.");
+    if (!identifier.trim() || !password) {
+      setError("Please enter your email or phone number, and password.");
       return;
     }
 
     setLoading(true);
-    const result = await login(email, password);
+    const result = await login(identifier, password);
     setLoading(false);
 
     if (!result.success) {
@@ -60,12 +60,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-slate-700">Email Address</label>
+            <label className="text-sm font-medium text-slate-700">Email or Phone Number</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="Enter your email or phone number"
               className={inputCls}
               style={{ "--tw-ring-color": "var(--color-primary)" } as React.CSSProperties}
               disabled={loading}

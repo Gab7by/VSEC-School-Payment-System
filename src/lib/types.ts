@@ -22,7 +22,8 @@ export type Session = {
   id: string;
   role: "admin" | "student";
   name: string;
-  email: string;
+  email?: string;
+  phone?: string;
   studentId?: string;
   schoolType?: string;
   classLevel?: string;

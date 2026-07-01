@@ -25,14 +25,14 @@ import Button from "../ui/Button";
 
 type Props = {
   onClose: () => void;
-  existingStudents: Array<{ studentId?: string; schoolType?: string }>;
+  existingStudents: Array<{ studentId?: string; schoolType?: string; phone?: string }>;
 };
 type Step = "form" | "success";
 
 export default function AddStudentModal({ onClose, existingStudents }: Props) {
   const [step, setStep] = useState<Step>("form");
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [schoolType, setSchoolType] = useState<SchoolType | "">("");
   const [classLevel, setClassLevel] = useState("");
   const [campus, setCampus] = useState<VsecCampus | "">("");
@@ -60,12 +60,16 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
     e.preventDefault();
     setError("");
 
-    if (!fullName.trim() || !email.trim() || !schoolType || !classLevel || !studentId) {
+    if (!fullName.trim() || !phone.trim() || !schoolType || !classLevel || !studentId) {
       setError("All fields are required.");
       return;
     }
     if (isVsec && (!campus || !studyMode || !nationalityGroup)) {
       setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
+      return;
+    }
+    if (existingStudents.some((s) => s.phone === phone.trim())) {
+      setError("A student with this phone number already exists.");
       return;
     }
 
@@ -79,7 +83,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
         db.tx.students[newId].update({
           studentId,
           fullName: fullName.trim(),
-          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
           schoolType,
           classLevel,
           ...(isVsec ? { campus, studyMode, nationalityGroup } : {}),
@@ -95,7 +99,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to create student. Email may already be registered."
+          : "Failed to create student. Phone number may already be registered."
       );
     } finally {
       setLoading(false);
@@ -119,7 +123,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
               </svg>
             </div>
             <p className="font-semibold text-gray-900">{fullName}</p>
-            <p className="text-sm text-gray-500">{email.toLowerCase()}</p>
+            <p className="text-sm text-gray-500">{phone}</p>
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
@@ -194,11 +198,11 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
         />
 
         <Input
-          label="Email Address"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="student@example.com"
+          label="Phone Number"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="e.g. 0244123456"
           disabled={loading}
         />
 

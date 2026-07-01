@@ -3,11 +3,13 @@ import { db } from "../../lib/db";
 import { VSEC_SCHOOL } from "../../lib/constants";
 import AddStudentModal from "../../components/admin/AddStudentModal";
 import ChangeClassModal from "../../components/admin/ChangeClassModal";
+import ResetStudentPasswordModal from "../../components/admin/ResetStudentPasswordModal";
 import type { Student } from "../../lib/types";
 
 export default function StudentsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [editStudent, setEditStudent] = useState<Student | null>(null);
+  const [resetPasswordStudent, setResetPasswordStudent] = useState<Student | null>(null);
   const [search, setSearch] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -106,7 +108,7 @@ export default function StudentsPage() {
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Student ID</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">School</th>
-                  <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
+                  <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Class / Enrollment</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Action</th>
                 </tr>
@@ -138,7 +140,7 @@ export default function StudentsPage() {
                         {student.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-slate-500 text-xs">{student.email}</td>
+                    <td className="px-5 py-3.5 text-slate-500 text-xs">{student.phone}</td>
                     <td className="px-5 py-3.5">
                       <p className="text-sm text-slate-700 font-medium">{student.classLevel}</p>
                       {student.schoolType === VSEC_SCHOOL && (
@@ -176,6 +178,12 @@ export default function StudentsPage() {
                             Edit Enrollment
                           </button>
                           <button
+                            onClick={() => setResetPasswordStudent(student as Student)}
+                            className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
+                          >
+                            Reset Password
+                          </button>
+                          <button
                             onClick={() => setConfirmDeleteId(student.id)}
                             className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:underline transition-colors"
                           >
@@ -197,6 +205,12 @@ export default function StudentsPage() {
         <ChangeClassModal
           student={editStudent}
           onClose={() => setEditStudent(null)}
+        />
+      )}
+      {resetPasswordStudent && (
+        <ResetStudentPasswordModal
+          student={resetPasswordStudent}
+          onClose={() => setResetPasswordStudent(null)}
         />
       )}
     </div>

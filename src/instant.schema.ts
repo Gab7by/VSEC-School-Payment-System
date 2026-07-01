@@ -22,7 +22,7 @@ const _schema = i.schema({
     students: i.entity({
       studentId: i.string().unique().indexed(),
       fullName: i.string(),
-      email: i.string().unique().indexed(),
+      phone: i.string().unique().indexed(),
       schoolType: i.string().indexed(),
       classLevel: i.string().indexed(),
       campus: i.string().indexed().optional(),

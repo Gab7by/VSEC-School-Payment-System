@@ -169,7 +169,7 @@ export default function ProfilePage() {
             <InfoRow label="Full Name" value={session?.name ?? "—"} />
           )}
           <InfoRow label="Student ID" value={session?.studentId ?? "—"} mono />
-          <InfoRow label="Email" value={session?.email ?? "—"} />
+          <InfoRow label="Phone" value={session?.phone ?? "—"} />
           <InfoRow label="School" value={session?.schoolType ?? "—"} />
           {session?.schoolType === VSEC_SCHOOL && (
             <>

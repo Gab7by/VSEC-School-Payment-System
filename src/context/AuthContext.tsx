@@ -16,7 +16,7 @@ type LoginResult = { success: boolean; error?: string };
 type AuthContextValue = {
   session: Session | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<LoginResult>;
+  login: (identifier: string, password: string) => Promise<LoginResult>;
   logout: () => void;
   refreshSession: (updates: Partial<Session>) => void;
 };
@@ -37,30 +37,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  async function login(email: string, password: string): Promise<LoginResult> {
-    const normalizedEmail = email.trim().toLowerCase();
+  async function login(identifier: string, password: string): Promise<LoginResult> {
+    const trimmed = identifier.trim();
     const hash = await hashPassword(password);
 
-    // Check admins first
-    const adminResult = await db.queryOnce({
-      admins: { $: { where: { email: normalizedEmail } } },
-    });
-    const admin = adminResult.data.admins?.[0];
-    if (admin && admin.passwordHash === hash) {
-      const s: Session = {
-        id: admin.id,
-        role: "admin",
-        name: admin.name,
-        email: admin.email,
-      };
-      localStorage.setItem(SESSION_KEY, JSON.stringify(s));
-      setSession(s);
-      return { success: true };
+    if (trimmed.includes("@")) {
+      // Admin login via email
+      const normalizedEmail = trimmed.toLowerCase();
+      const adminResult = await db.queryOnce({
+        admins: { $: { where: { email: normalizedEmail } } },
+      });
+      const admin = adminResult.data.admins?.[0];
+      if (admin && admin.passwordHash === hash) {
+        const s: Session = {
+          id: admin.id,
+          role: "admin",
+          name: admin.name,
+          email: admin.email,
+        };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+        setSession(s);
+        return { success: true };
+      }
+      return { success: false, error: "Invalid email or password." };
     }
 
-    // Check students
+    // Student login via phone number
     const studentResult = await db.queryOnce({
-      students: { $: { where: { email: normalizedEmail } } },
+      students: { $: { where: { phone: trimmed } } },
     });
     const student = studentResult.data.students?.[0];
     if (student && student.passwordHash === hash) {
@@ -68,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: student.id,
         role: "student",
         name: student.fullName,
-        email: student.email,
+        phone: student.phone,
         studentId: student.studentId,
         schoolType: student.schoolType,
         classLevel: student.classLevel,
@@ -82,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: true };
     }
 
-    return { success: false, error: "Invalid email or password." };
+    return { success: false, error: "Invalid phone number or password." };
   }
 
   function logout() {

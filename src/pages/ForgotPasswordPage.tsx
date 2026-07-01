@@ -19,10 +19,7 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [userInfo, setUserInfo] = useState<{
-    id: string;
-    role: "admin" | "student";
-  } | null>(null);
+  const [userInfo, setUserInfo] = useState<{ id: string } | null>(null);
 
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault();
@@ -32,14 +29,12 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      const [adminResult, studentResult] = await Promise.all([
-        db.queryOnce({ admins: { $: { where: { email: normalizedEmail } } } }),
-        db.queryOnce({ students: { $: { where: { email: normalizedEmail } } } }),
-      ]);
+      const adminResult = await db.queryOnce({
+        admins: { $: { where: { email: normalizedEmail } } },
+      });
       const admin = adminResult.data.admins?.[0];
-      const student = studentResult.data.students?.[0];
-      if (!admin && !student) { setError("No account found with this email address."); setLoading(false); return; }
-      setUserInfo({ id: admin ? admin.id : student!.id, role: admin ? "admin" : "student" });
+      if (!admin) { setError("No admin account found with this email address."); setLoading(false); return; }
+      setUserInfo({ id: admin.id });
       await db.auth.sendMagicCode({ email: normalizedEmail });
       setStep("otp");
     } catch (err) {
@@ -87,11 +82,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     try {
       const hash = await hashPassword(newPassword);
-      if (userInfo.role === "admin") {
-        await db.transact(db.tx.admins[userInfo.id].update({ passwordHash: hash }));
-      } else {
-        await db.transact(db.tx.students[userInfo.id].update({ passwordHash: hash, isFirstLogin: false }));
-      }
+      await db.transact(db.tx.admins[userInfo.id].update({ passwordHash: hash }));
       await db.auth.signOut();
       await login(email, newPassword);
     } catch (err) {

@@ -94,7 +94,7 @@ export default function MakePaymentForm() {
   // Must be called unconditionally at top level (React rules of hooks)
   const initializePayment = usePaystackPayment({
     reference: new Date().getTime().toString(),
-    email: session?.email ?? "",
+    email: session?.studentId ? `${session.studentId}@vsec.local` : "",
     amount: Math.round(amountNum * 100),
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string,
     currency: currency === "USD" ? "USD" : "GHS",

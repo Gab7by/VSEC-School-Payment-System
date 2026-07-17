@@ -41,8 +41,11 @@ export const CLASS_LEVELS: Record<SchoolType, readonly string[]> = {
   ],
 };
 
-export const TERMS = ["Term 1", "Term 2", "Term 3"] as const;
-export type Term = (typeof TERMS)[number];
+export const TERMS_BY_SCHOOL: Record<SchoolType, readonly string[]> = {
+  "VSEC College of Studies": ["Term 1", "Term 2", "Term 3", "Term 4"],
+  "Donkor Kids Talent International School": ["Term 1", "Term 2", "Term 3"],
+};
+export type Term = (typeof TERMS_BY_SCHOOL)[SchoolType][number];
 
 export const ALL_CLASSES_LABEL = "All Classes";
 export const ALL_CAMPUSES_LABEL = "All Campuses";

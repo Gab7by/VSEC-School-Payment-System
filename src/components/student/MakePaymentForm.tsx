@@ -3,7 +3,7 @@ import { usePaystackPayment } from "react-paystack";
 import { db } from "../../lib/db";
 import { id } from "@instantdb/react";
 import { formatCurrency } from "../../lib/utils";
-import { TERMS, VSEC_SCHOOL, getCurrency, type Term } from "../../lib/constants";
+import { TERMS_BY_SCHOOL, VSEC_SCHOOL, getCurrency, type SchoolType, type Term } from "../../lib/constants";
 import { useAuth } from "../../context/AuthContext";
 import PaymentSuccessModal from "../admin/PaymentSuccessModal";
 import type { ReceiptData } from "../admin/ReceiptPrint";
@@ -58,6 +58,8 @@ export default function MakePaymentForm() {
   const allFeeTypes = (data?.feeTypes ?? []) as FeeType[];
   const currency = getCurrency(student?.nationalityGroup);
 
+  const termOptions = student ? TERMS_BY_SCHOOL[student.schoolType as SchoolType] : [];
+
   const matchingFeeTypes = useMemo(() => {
     if (!selectedTerm || !student) return [];
     return allFeeTypes.filter((ft) => {
@@ -94,7 +96,7 @@ export default function MakePaymentForm() {
   // Must be called unconditionally at top level (React rules of hooks)
   const initializePayment = usePaystackPayment({
     reference: new Date().getTime().toString(),
-    email: session?.studentId ? `${session.studentId}@vsec.local` : "",
+    email: `${session?.studentId ?? session?.id ?? "student"}@vseccollege.com`,
     amount: Math.round(amountNum * 100),
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string,
     currency: currency === "USD" ? "USD" : "GHS",
@@ -170,13 +172,13 @@ export default function MakePaymentForm() {
         {/* Step 1: Term */}
         <div>
           <StepHeader num={1} label="Select Term" />
-          <div className="grid grid-cols-3 gap-3">
-            {TERMS.map((t) => (
+          <div className={`grid gap-3 ${termOptions.length >= 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}`}>
+            {termOptions.map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => {
-                  setSelectedTerm(t);
+                  setSelectedTerm(t as Term);
                   setSelectedFeeTypeId("");
                 }}
                 className="py-2.5 sm:py-3 rounded-xl border text-xs sm:text-sm font-semibold transition-all"

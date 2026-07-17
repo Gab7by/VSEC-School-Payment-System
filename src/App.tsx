@@ -10,6 +10,7 @@ import DashboardPage from "./pages/admin/DashboardPage";
 import StudentsPage from "./pages/admin/StudentsPage";
 import FeesPage from "./pages/admin/FeesPage";
 import PaymentsPage from "./pages/admin/PaymentsPage";
+import BulkSmsPage from "./pages/admin/BulkSmsPage";
 import HomePage from "./pages/student/HomePage";
 import StudentPaymentsPage from "./pages/student/PaymentsPage";
 import HistoryPage from "./pages/student/HistoryPage";
@@ -50,6 +51,7 @@ function App() {
           <Route path="/admin/students" element={<StudentsPage />} />
           <Route path="/admin/fees" element={<FeesPage />} />
           <Route path="/admin/payments" element={<PaymentsPage />} />
+          <Route path="/admin/sms" element={<BulkSmsPage />} />
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

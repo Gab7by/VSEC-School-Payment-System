@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { db } from "../../lib/db";
 import { VSEC_SCHOOL } from "../../lib/constants";
 import AddStudentModal from "../../components/admin/AddStudentModal";
@@ -7,6 +8,7 @@ import ResetStudentPasswordModal from "../../components/admin/ResetStudentPasswo
 import type { Student } from "../../lib/types";
 
 export default function StudentsPage() {
+  const navigate = useNavigate();
   const [showAdd, setShowAdd] = useState(false);
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [resetPasswordStudent, setResetPasswordStudent] = useState<Student | null>(null);
@@ -182,6 +184,12 @@ export default function StudentsPage() {
                             className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
                           >
                             Reset Password
+                          </button>
+                          <button
+                            onClick={() => navigate("/admin/sms", { state: { presetStudentId: student.id } })}
+                            className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
+                          >
+                            Send SMS
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(student.id)}

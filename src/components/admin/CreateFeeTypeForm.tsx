@@ -4,7 +4,7 @@ import { id } from "@instantdb/react";
 import {
   SCHOOL_TYPES,
   CLASS_LEVELS,
-  TERMS,
+  TERMS_BY_SCHOOL,
   VSEC_SCHOOL,
   VSEC_CAMPUSES,
   VSEC_STUDY_MODES,
@@ -31,6 +31,9 @@ export default function CreateFeeTypeForm() {
   const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">("");
   const [classLevel, setClassLevel] = useState("");
   const [term, setTerm] = useState<Term | "">("");
+  const [applyAllClasses, setApplyAllClasses] = useState(false);
+  const [applyAllCampuses, setApplyAllCampuses] = useState(false);
+  const [applyAllStudyModes, setApplyAllStudyModes] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -39,7 +42,12 @@ export default function CreateFeeTypeForm() {
 
   const classOptions = useMemo(() => {
     if (!schoolType) return [];
-    return [ALL_CLASSES_LABEL, ...CLASS_LEVELS[schoolType]];
+    return CLASS_LEVELS[schoolType];
+  }, [schoolType]);
+
+  const termOptions = useMemo(() => {
+    if (!schoolType) return [];
+    return TERMS_BY_SCHOOL[schoolType];
   }, [schoolType]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -47,11 +55,14 @@ export default function CreateFeeTypeForm() {
     setError("");
     setSuccess(false);
 
-    if (!feeName.trim() || !amount || !schoolType || !classLevel || !term) {
+    if (!feeName.trim() || !amount || !schoolType || (!applyAllClasses && !classLevel) || !term) {
       setError("All fields are required.");
       return;
     }
-    if (isVsec && (!campus || !studyMode || !nationalityGroup)) {
+    if (
+      isVsec &&
+      ((!applyAllCampuses && !campus) || (!applyAllStudyModes && !studyMode) || !nationalityGroup)
+    ) {
       setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
       return;
     }
@@ -68,14 +79,14 @@ export default function CreateFeeTypeForm() {
           feeName: feeName.trim(),
           amount: numAmount,
           schoolType,
-          classLevel,
-          allClasses: classLevel === ALL_CLASSES_LABEL,
+          classLevel: applyAllClasses ? ALL_CLASSES_LABEL : classLevel,
+          allClasses: applyAllClasses,
           ...(isVsec
             ? {
-                campus,
-                studyMode,
-                allCampuses: campus === ALL_CAMPUSES_LABEL,
-                allStudyModes: studyMode === ALL_STUDY_MODES_LABEL,
+                campus: applyAllCampuses ? ALL_CAMPUSES_LABEL : campus,
+                studyMode: applyAllStudyModes ? ALL_STUDY_MODES_LABEL : studyMode,
+                allCampuses: applyAllCampuses,
+                allStudyModes: applyAllStudyModes,
                 nationalityGroup,
               }
             : {
@@ -97,6 +108,9 @@ export default function CreateFeeTypeForm() {
       setNationalityGroup("");
       setClassLevel("");
       setTerm("");
+      setApplyAllClasses(false);
+      setApplyAllCampuses(false);
+      setApplyAllStudyModes(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -122,6 +136,10 @@ export default function CreateFeeTypeForm() {
             setCampus("");
             setStudyMode("");
             setNationalityGroup("");
+            setTerm("");
+            setApplyAllClasses(false);
+            setApplyAllCampuses(false);
+            setApplyAllStudyModes(false);
           }}
           placeholder="Select school type"
           disabled={loading}
@@ -133,31 +151,65 @@ export default function CreateFeeTypeForm() {
 
         {isVsec && (
           <>
-            <Select
-              label="Campus"
-              value={campus}
-              onChange={(e) => setCampus(e.target.value)}
-              placeholder="Select campus"
-              disabled={loading}
-            >
-              <option value={ALL_CAMPUSES_LABEL}>{ALL_CAMPUSES_LABEL}</option>
-              {VSEC_CAMPUSES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </Select>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-slate-700">Campus</label>
+                <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={applyAllCampuses}
+                    onChange={(e) => {
+                      setApplyAllCampuses(e.target.checked);
+                      setCampus("");
+                    }}
+                    disabled={loading}
+                    style={{ accentColor: "var(--color-primary)" }}
+                    className="w-3.5 h-3.5 rounded"
+                  />
+                  Apply to all campuses
+                </label>
+              </div>
+              <Select
+                value={campus}
+                onChange={(e) => setCampus(e.target.value)}
+                placeholder="Select campus"
+                disabled={loading || applyAllCampuses}
+              >
+                {VSEC_CAMPUSES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </Select>
+            </div>
 
-            <Select
-              label="Study Mode"
-              value={studyMode}
-              onChange={(e) => setStudyMode(e.target.value)}
-              placeholder="Select study mode"
-              disabled={loading}
-            >
-              <option value={ALL_STUDY_MODES_LABEL}>{ALL_STUDY_MODES_LABEL}</option>
-              {VSEC_STUDY_MODES.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </Select>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-slate-700">Study Mode</label>
+                <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={applyAllStudyModes}
+                    onChange={(e) => {
+                      setApplyAllStudyModes(e.target.checked);
+                      setStudyMode("");
+                    }}
+                    disabled={loading}
+                    style={{ accentColor: "var(--color-primary)" }}
+                    className="w-3.5 h-3.5 rounded"
+                  />
+                  Apply to all modes
+                </label>
+              </div>
+              <Select
+                value={studyMode}
+                onChange={(e) => setStudyMode(e.target.value)}
+                placeholder="Select study mode"
+                disabled={loading || applyAllStudyModes}
+              >
+                {VSEC_STUDY_MODES.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </Select>
+            </div>
 
             <Select
               label="Nationality Group"
@@ -173,26 +225,44 @@ export default function CreateFeeTypeForm() {
           </>
         )}
 
-        <Select
-          label="Class Level"
-          value={classLevel}
-          onChange={(e) => setClassLevel(e.target.value)}
-          placeholder="Select class"
-          disabled={!schoolType || loading}
-        >
-          {classOptions.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </Select>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-slate-700">Class Level</label>
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={applyAllClasses}
+                onChange={(e) => {
+                  setApplyAllClasses(e.target.checked);
+                  setClassLevel("");
+                }}
+                disabled={!schoolType || loading}
+                style={{ accentColor: "var(--color-primary)" }}
+                className="w-3.5 h-3.5 rounded"
+              />
+              Apply to all classes
+            </label>
+          </div>
+          <Select
+            value={classLevel}
+            onChange={(e) => setClassLevel(e.target.value)}
+            placeholder="Select class"
+            disabled={!schoolType || loading || applyAllClasses}
+          >
+            {classOptions.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </Select>
+        </div>
 
         <Select
           label="Term"
           value={term}
           onChange={(e) => setTerm(e.target.value as Term)}
           placeholder="Select term"
-          disabled={loading}
+          disabled={!schoolType || loading}
         >
-          {TERMS.map((t) => (
+          {termOptions.map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </Select>

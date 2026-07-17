@@ -58,6 +58,19 @@ const _schema = i.schema({
       currency: i.string().indexed().optional(),
       createdAt: i.number().indexed(),
     }),
+    smsLogs: i.entity({
+      message: i.string(),
+      recipients: i.json(),
+      recipientCount: i.number().indexed(),
+      sendType: i.string().indexed(),
+      status: i.string().indexed(),
+      sentAt: i.number().indexed(),
+      sentByAdminId: i.string(),
+      sentByAdminName: i.string(),
+      arkeselMessageIds: i.json(),
+      creditsUsed: i.number(),
+      errorMessage: i.string().optional(),
+    }),
   },
   links: {
     studentPayments: {

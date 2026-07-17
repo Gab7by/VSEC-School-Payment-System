@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { db } from "../../lib/db";
 import { formatCurrency, formatDate } from "../../lib/utils";
+import { downloadPaymentsExcel } from "../../lib/paymentsExcel";
+import type { PaymentWithLinks } from "../../lib/types";
 
 type DeleteTarget =
   | { mode: "all"; count: number }
@@ -96,18 +98,32 @@ export default function PaymentsPage() {
             {payments.length} payment record{payments.length !== 1 ? "s" : ""}
           </p>
         </div>
-        {payments.length > 0 && (
-          <button
-            onClick={() => {
-              setDeleteError("");
-              setDeleteTarget({ mode: "all", count: payments.length });
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-rose-600 border border-rose-300 rounded-xl hover:bg-rose-50 transition-colors"
-          >
-            <TrashIcon />
-            Delete All
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {filtered.length > 0 && (
+            <button
+              onClick={() => downloadPaymentsExcel(filtered as PaymentWithLinks[])}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border rounded-xl transition-colors"
+              style={{ color: "var(--color-primary-dark)", borderColor: "var(--color-primary)", background: "rgba(11,61,145,0.04)" }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+              </svg>
+              Export to Excel
+            </button>
+          )}
+          {payments.length > 0 && (
+            <button
+              onClick={() => {
+                setDeleteError("");
+                setDeleteTarget({ mode: "all", count: payments.length });
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-rose-600 border border-rose-300 rounded-xl hover:bg-rose-50 transition-colors"
+            >
+              <TrashIcon />
+              Delete All
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Search */}

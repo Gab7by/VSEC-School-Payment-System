@@ -11,6 +11,11 @@ interface ApiResponse {
   json(body: unknown): void;
 }
 
+// Vercel's isolated build-time type-check for /api functions doesn't reliably
+// pick up @types/node via this repo's tsconfig project-reference setup, so
+// declare just what this file needs rather than depending on ambient globals.
+declare const process: { env: Record<string, string | undefined> };
+
 const ARKESEL_SEND_URL = "https://sms.arkesel.com/api/v2/sms/send";
 const BATCH_SIZE = 100;
 const PHONE_PATTERN = /^233\d{9}$/;

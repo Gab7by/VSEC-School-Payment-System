@@ -1,5 +1,6 @@
 import { db } from "../lib/db";
 import { VSEC_SCHOOL } from "../lib/constants";
+import { feeMatchesStudent } from "../lib/feeMatching";
 
 export type DashboardFilter =
   | "All"
@@ -66,12 +67,7 @@ export function useAdminDashboardStats(filter: DashboardFilter) {
       if (ft.nationalityGroup === "International") continue;
     }
 
-    const matchingStudents = filteredStudents.filter(
-      (s) =>
-        s.schoolType === ft.schoolType &&
-        (ft.allClasses || s.classLevel === ft.classLevel) &&
-        (s.schoolType !== VSEC_SCHOOL || s.nationalityGroup === ft.nationalityGroup)
-    );
+    const matchingStudents = filteredStudents.filter((s) => feeMatchesStudent(ft, s));
     totalRevenue += (ft.amount ?? 0) * matchingStudents.length;
   }
 

@@ -55,9 +55,9 @@ export default function ChangeClassModal({ student, onClose }: Props) {
         db.tx.students[student.id].update({
           schoolType,
           classLevel,
-          campus: isVsec ? campus : undefined,
-          studyMode: isVsec ? studyMode : undefined,
-          nationalityGroup: isVsec ? nationalityGroup : undefined,
+          campus: isVsec ? campus : "",
+          studyMode: isVsec ? studyMode : "",
+          nationalityGroup: isVsec ? nationalityGroup : "",
         })
       );
       onClose();

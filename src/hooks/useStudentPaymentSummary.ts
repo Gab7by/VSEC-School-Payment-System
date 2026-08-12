@@ -1,5 +1,6 @@
 import { db } from "../lib/db";
-import { VSEC_SCHOOL, getCurrency } from "../lib/constants";
+import { getCurrency } from "../lib/constants";
+import { feeMatchesStudent } from "../lib/feeMatching";
 
 export function useStudentPaymentSummary(studentId: string) {
   const { data, isLoading, error } = db.useQuery({
@@ -26,13 +27,7 @@ export function useStudentPaymentSummary(studentId: string) {
 
   let totalDue = 0;
   for (const ft of feeTypes) {
-    if (ft.schoolType !== student.schoolType) continue;
-    if (!ft.allClasses && ft.classLevel !== student.classLevel) continue;
-    if (student.schoolType === VSEC_SCHOOL) {
-      if (!ft.allCampuses && ft.campus !== student.campus) continue;
-      if (!ft.allStudyModes && ft.studyMode !== student.studyMode) continue;
-      if (ft.nationalityGroup !== student.nationalityGroup) continue;
-    }
+    if (!feeMatchesStudent(ft, student)) continue;
     totalDue += ft.amount ?? 0;
   }
 

@@ -3,7 +3,8 @@ import { usePaystackPayment } from "react-paystack";
 import { db } from "../../lib/db";
 import { id } from "@instantdb/react";
 import { formatCurrency } from "../../lib/utils";
-import { TERMS_BY_SCHOOL, VSEC_SCHOOL, getCurrency, type SchoolType, type Term } from "../../lib/constants";
+import { TERMS_BY_SCHOOL, getCurrency, type SchoolType, type Term } from "../../lib/constants";
+import { feeMatchesStudent } from "../../lib/feeMatching";
 import { useAuth } from "../../context/AuthContext";
 import PaymentSuccessModal from "../admin/PaymentSuccessModal";
 import type { ReceiptData } from "../admin/ReceiptPrint";
@@ -64,14 +65,7 @@ export default function MakePaymentForm() {
     if (!selectedTerm || !student) return [];
     return allFeeTypes.filter((ft) => {
       if (ft.term !== selectedTerm) return false;
-      if (ft.schoolType !== student.schoolType) return false;
-      if (!ft.allClasses && ft.classLevel !== student.classLevel) return false;
-      if (student.schoolType === VSEC_SCHOOL) {
-        if (!ft.allCampuses && ft.campus !== student.campus) return false;
-        if (!ft.allStudyModes && ft.studyMode !== student.studyMode) return false;
-        if (ft.nationalityGroup !== student.nationalityGroup) return false;
-      }
-      return true;
+      return feeMatchesStudent(ft, student);
     });
   }, [selectedTerm, allFeeTypes, student]);
 

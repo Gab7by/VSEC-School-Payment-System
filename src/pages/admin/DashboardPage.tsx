@@ -133,15 +133,11 @@ export default function DashboardPage() {
       >
         {filter === "All" ? (
           <p style={{ color: "var(--color-primary-dark)" }}>
-            International student fees (USD) are excluded from these totals — select{" "}
-            <strong>VSEC — International</strong> to view USD statistics.
+            Showing statistics for <strong>all students</strong>.
           </p>
         ) : (
           <p style={{ color: "var(--color-primary-dark)" }}>
             Showing statistics for <strong>{filter}</strong> students only.
-            {filter === "VSEC — International" && (
-              <span className="ml-1">Amounts in <strong>USD ($)</strong>.</span>
-            )}
           </p>
         )}
       </div>
@@ -172,7 +168,7 @@ export default function DashboardPage() {
                 This will permanently delete{" "}
                 <strong>{stats.filteredPaymentIds.length} payment record{stats.filteredPaymentIds.length !== 1 ? "s" : ""}</strong>{" "}
                 and reset the total fees paid to{" "}
-                <strong>{stats.currency === "USD" ? "$0.00" : "GHS 0.00"}</strong>.
+                <strong>GHS 0.00</strong>.
               </p>
               <p className="text-rose-700">
                 <span className="font-medium">Scope:</span>{" "}

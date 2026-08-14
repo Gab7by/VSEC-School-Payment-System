@@ -54,6 +54,7 @@ export const ALL_STUDY_MODES_LABEL = "All Study Modes";
 export const VSEC_NATIONALITY_GROUPS = ["Ghanaian", "International"] as const;
 export type VsecNationalityGroup = (typeof VSEC_NATIONALITY_GROUPS)[number];
 
-export function getCurrency(nationalityGroup?: string): "GHS" | "USD" {
-  return nationalityGroup === "International" ? "USD" : "GHS";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for call-site compatibility
+export function getCurrency(_nationalityGroup?: string): "GHS" | "USD" {
+  return "GHS";
 }

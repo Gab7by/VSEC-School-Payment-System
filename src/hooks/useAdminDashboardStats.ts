@@ -34,13 +34,10 @@ export function useAdminDashboardStats(filter: DashboardFilter) {
     filteredStudents = students.filter(
       (s) => s.schoolType === "Donkor Kids Talent International School"
     );
-  } else {
-    // "All" — exclude International students from monetary totals (currency mixing)
-    filteredStudents = students.filter((s) => s.nationalityGroup !== "International");
   }
 
-  // Determine currency
-  const currency: "GHS" | "USD" = filter === "VSEC — International" ? "USD" : "GHS";
+  // All currency is GHS now
+  const currency: "GHS" | "USD" = "GHS";
 
   // Collect all payments for filtered students
   let totalPaid = 0;
@@ -62,9 +59,6 @@ export function useAdminDashboardStats(filter: DashboardFilter) {
       if (ft.schoolType !== VSEC_SCHOOL || ft.nationalityGroup !== "International") continue;
     } else if (filter === "Donkor Kids Talent International School") {
       if (ft.schoolType !== "Donkor Kids Talent International School") continue;
-    } else {
-      // "All" — exclude International fees
-      if (ft.nationalityGroup === "International") continue;
     }
 
     const matchingStudents = filteredStudents.filter((s) => feeMatchesStudent(ft, s));

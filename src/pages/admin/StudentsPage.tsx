@@ -20,12 +20,14 @@ export default function StudentsPage() {
     setDeleting(true);
     try {
       const result = await db.queryOnce({
-        students: { $: { where: { id: studentId } }, payments: {} },
+        students: { $: { where: { id: studentId } }, payments: {}, individualFees: {} },
       });
       const student = result.data.students?.[0];
       const paymentIds = (student?.payments ?? []).map((p) => p.id);
+      const individualFeeIds = (student?.individualFees ?? []).map((f) => f.id);
       await db.transact([
         ...paymentIds.map((pid) => db.tx.payments[pid].delete()),
+        ...individualFeeIds.map((fid) => db.tx.feeTypes[fid].delete()),
         db.tx.students[studentId].delete(),
       ]);
       setConfirmDeleteId(null);

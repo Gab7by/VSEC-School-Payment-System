@@ -22,6 +22,7 @@ type FeeType = {
   allStudyModes?: boolean;
   nationalityGroup?: string;
   term?: string;
+  assignedStudent?: { id: string } | null;
 };
 
 function StepHeader({ num, label }: { num: number; label: string }) {
@@ -52,7 +53,7 @@ export default function MakePaymentForm() {
       $: { where: { id: session?.id ?? "" } },
       payments: { feeType: {} },
     },
-    feeTypes: {},
+    feeTypes: { assignedStudent: {} },
   });
 
   const student = data?.students?.[0];

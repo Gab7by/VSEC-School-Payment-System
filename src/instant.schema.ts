@@ -35,6 +35,7 @@ const _schema = i.schema({
     feeTypes: i.entity({
       feeName: i.string().indexed(),
       amount: i.number(),
+      description: i.string().optional(),
       schoolType: i.string().indexed(),
       classLevel: i.string().indexed(),
       allClasses: i.boolean(),
@@ -95,6 +96,18 @@ const _schema = i.schema({
         on: "feeTypes",
         has: "many",
         label: "payments",
+      },
+    },
+    feeTypeAssignedStudent: {
+      forward: {
+        on: "feeTypes",
+        has: "one",
+        label: "assignedStudent",
+      },
+      reverse: {
+        on: "students",
+        has: "many",
+        label: "individualFees",
       },
     },
   },

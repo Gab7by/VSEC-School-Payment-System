@@ -2,6 +2,7 @@ import { useState } from "react";
 import { db } from "../../lib/db";
 import { VSEC_SCHOOL, ALL_CAMPUSES_LABEL, ALL_STUDY_MODES_LABEL, getCurrency } from "../../lib/constants";
 import CreateFeeTypeForm from "../../components/admin/CreateFeeTypeForm";
+import AssignIndividualFeeForm from "../../components/admin/AssignIndividualFeeForm";
 import { formatCurrency } from "../../lib/utils";
 
 export default function FeesPage() {
@@ -9,7 +10,7 @@ export default function FeesPage() {
   const [deleting, setDeleting] = useState(false);
 
   const { data, isLoading } = db.useQuery({
-    feeTypes: { $: { order: { createdAt: "desc" } } },
+    feeTypes: { $: { order: { createdAt: "desc" } }, assignedStudent: {} },
   });
 
   const feeTypes = data?.feeTypes ?? [];
@@ -32,6 +33,8 @@ export default function FeesPage() {
       </div>
 
       <CreateFeeTypeForm />
+
+      <AssignIndividualFeeForm />
 
       {/* Existing fee types table */}
       <div>
@@ -70,7 +73,12 @@ export default function FeesPage() {
                         onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(11,61,145,0.03)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                       >
-                        <td className="px-5 py-3.5 font-semibold text-slate-900">{ft.feeName}</td>
+                        <td className="px-5 py-3.5">
+                          <p className="font-semibold text-slate-900">{ft.feeName}</p>
+                          {ft.description && (
+                            <p className="text-xs text-slate-400 mt-0.5">{ft.description}</p>
+                          )}
+                        </td>
                         <td className="px-5 py-3.5">
                           <span className={`font-bold ${isIntl ? "text-blue-700" : "text-emerald-700"}`}>
                             {formatCurrency(ft.amount ?? 0, currency)}
@@ -89,19 +97,30 @@ export default function FeesPage() {
                           )}
                         </td>
                         <td className="px-5 py-3.5 whitespace-nowrap">
-                          <span
-                            className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold"
-                            style={
-                              ft.schoolType === VSEC_SCHOOL
-                                ? { background: "rgba(11,61,145,0.1)", color: "var(--color-primary)" }
-                                : { background: "#ccfbf1", color: "#0f766e" }
-                            }
-                          >
-                            {ft.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
-                          </span>
+                          {ft.assignedStudent ? (
+                            <span
+                              className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold"
+                              style={{ background: "rgba(168,85,247,0.12)", color: "#7e22ce" }}
+                            >
+                              Individual: {ft.assignedStudent.fullName}
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold"
+                              style={
+                                ft.schoolType === VSEC_SCHOOL
+                                  ? { background: "rgba(11,61,145,0.1)", color: "var(--color-primary)" }
+                                  : { background: "#ccfbf1", color: "#0f766e" }
+                              }
+                            >
+                              {ft.schoolType === VSEC_SCHOOL ? "VSEC College" : "Donkor Kids"}
+                            </span>
+                          )}
                         </td>
                         <td className="px-5 py-3.5">
-                          {ft.schoolType === VSEC_SCHOOL ? (
+                          {ft.assignedStudent ? (
+                            <span className="text-xs text-slate-400">—</span>
+                          ) : ft.schoolType === VSEC_SCHOOL ? (
                             <div>
                               <p className="text-xs text-slate-700 font-medium">
                                 {ft.allCampuses ? ALL_CAMPUSES_LABEL : (ft.campus || "—")}
@@ -119,7 +138,9 @@ export default function FeesPage() {
                             <span className="text-xs text-slate-400">—</span>
                           )}
                         </td>
-                        <td className="px-5 py-3.5 text-slate-600">{ft.classLevel}</td>
+                        <td className="px-5 py-3.5 text-slate-600">
+                          {ft.assignedStudent ? "—" : ft.classLevel}
+                        </td>
                         <td className="px-5 py-3.5 text-slate-600">{ft.term}</td>
                         <td className="px-5 py-3.5 text-right whitespace-nowrap">
                           {confirmDeleteId === ft.id ? (

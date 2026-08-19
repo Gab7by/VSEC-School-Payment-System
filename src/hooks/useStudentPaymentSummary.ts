@@ -8,7 +8,7 @@ export function useStudentPaymentSummary(studentId: string) {
       $: { where: { id: studentId } },
       payments: { feeType: {} },
     },
-    feeTypes: {},
+    feeTypes: { assignedStudent: {} },
   });
 
   if (isLoading || error || !data) {

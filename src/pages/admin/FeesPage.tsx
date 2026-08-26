@@ -3,11 +3,14 @@ import { db } from "../../lib/db";
 import { VSEC_SCHOOL, ALL_CAMPUSES_LABEL, ALL_STUDY_MODES_LABEL, getCurrency } from "../../lib/constants";
 import CreateFeeTypeForm from "../../components/admin/CreateFeeTypeForm";
 import AssignIndividualFeeForm from "../../components/admin/AssignIndividualFeeForm";
+import EditFeeTypeModal from "../../components/admin/EditFeeTypeModal";
 import { formatCurrency } from "../../lib/utils";
+import type { FeeTypeWithStudent } from "../../lib/types";
 
 export default function FeesPage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [editFeeType, setEditFeeType] = useState<FeeTypeWithStudent | null>(null);
 
   const { data, isLoading } = db.useQuery({
     feeTypes: { $: { order: { createdAt: "desc" } }, assignedStudent: {} },
@@ -143,32 +146,41 @@ export default function FeesPage() {
                         </td>
                         <td className="px-5 py-3.5 text-slate-600">{ft.term}</td>
                         <td className="px-5 py-3.5 text-right whitespace-nowrap">
-                          {confirmDeleteId === ft.id ? (
-                            <span className="inline-flex items-center gap-2">
-                              <span className="text-xs text-slate-500">Delete?</span>
-                              <button
-                                onClick={() => handleDelete(ft.id)}
-                                disabled={deleting}
-                                className="text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-60 px-2.5 py-1 rounded-lg transition-colors"
-                              >
-                                {deleting ? "…" : "Yes"}
-                              </button>
-                              <button
-                                onClick={() => setConfirmDeleteId(null)}
-                                disabled={deleting}
-                                className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors"
-                              >
-                                No
-                              </button>
-                            </span>
-                          ) : (
+                          <span className="inline-flex items-center gap-3 justify-end">
                             <button
-                              onClick={() => setConfirmDeleteId(ft.id)}
-                              className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:underline transition-colors"
+                              onClick={() => setEditFeeType(ft)}
+                              className="text-xs font-semibold hover:underline transition-colors"
+                              style={{ color: "var(--color-primary)" }}
                             >
-                              Delete
+                              Edit
                             </button>
-                          )}
+                            {confirmDeleteId === ft.id ? (
+                              <span className="inline-flex items-center gap-2">
+                                <span className="text-xs text-slate-500">Delete?</span>
+                                <button
+                                  onClick={() => handleDelete(ft.id)}
+                                  disabled={deleting}
+                                  className="text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-60 px-2.5 py-1 rounded-lg transition-colors"
+                                >
+                                  {deleting ? "…" : "Yes"}
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDeleteId(null)}
+                                  disabled={deleting}
+                                  className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors"
+                                >
+                                  No
+                                </button>
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => setConfirmDeleteId(ft.id)}
+                                className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:underline transition-colors"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </span>
                         </td>
                       </tr>
                     );
@@ -179,6 +191,13 @@ export default function FeesPage() {
           )}
         </div>
       </div>
+
+      {editFeeType && (
+        <EditFeeTypeModal
+          feeType={editFeeType}
+          onClose={() => setEditFeeType(null)}
+        />
+      )}
     </div>
   );
 }

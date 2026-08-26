@@ -24,6 +24,12 @@ export type FeeTypeWithStudent = InstaQLEntity<
   { assignedStudent: object }
 >;
 
+export type FeeTypeForStudent = InstaQLEntity<
+  AppSchema,
+  "feeTypes",
+  { assignedStudent: object; excludedStudents: object; overridesFeeType: object }
+>;
+
 export type Session = {
   id: string;
   role: "admin" | "student";

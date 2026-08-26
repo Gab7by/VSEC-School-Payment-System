@@ -11,7 +11,7 @@ export type DashboardFilter =
 export function useAdminDashboardStats(filter: DashboardFilter) {
   const { data, isLoading, error } = db.useQuery({
     students: { payments: {} },
-    feeTypes: { assignedStudent: {} },
+    feeTypes: { assignedStudent: {}, excludedStudents: {} },
   });
 
   if (isLoading || error || !data) {

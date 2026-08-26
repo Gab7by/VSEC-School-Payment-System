@@ -10,6 +10,7 @@ export type FeeMatchFee = {
   allStudyModes?: boolean;
   nationalityGroup?: string;
   assignedStudent?: { id?: string } | null;
+  excludedStudents?: { id?: string }[] | null;
 };
 
 export type FeeMatchStudent = {
@@ -22,10 +23,13 @@ export type FeeMatchStudent = {
 };
 
 // A fee assigned to a specific student matches only that student, bypassing
-// every other criterion. Otherwise, VSEC fees must match Campus + Study Mode +
-// Class Level + Nationality together; other schools match on Class Level only.
+// every other criterion. A general fee that has excluded a specific student
+// (e.g. because they got a personalized replacement) never matches them.
+// Otherwise, VSEC fees must match Campus + Study Mode + Class Level +
+// Nationality together; other schools match on Class Level only.
 export function feeMatchesStudent(fee: FeeMatchFee, student: FeeMatchStudent): boolean {
   if (fee.assignedStudent?.id) return fee.assignedStudent.id === student.id;
+  if (fee.excludedStudents?.some((s) => s.id === student.id)) return false;
   if (fee.schoolType !== student.schoolType) return false;
   if (!fee.allClasses && fee.classLevel !== student.classLevel) return false;
   if (student.schoolType === VSEC_SCHOOL) {

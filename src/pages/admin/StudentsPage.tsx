@@ -5,6 +5,7 @@ import { VSEC_SCHOOL } from "../../lib/constants";
 import AddStudentModal from "../../components/admin/AddStudentModal";
 import ChangeClassModal from "../../components/admin/ChangeClassModal";
 import ResetStudentPasswordModal from "../../components/admin/ResetStudentPasswordModal";
+import StudentFeesModal from "../../components/admin/StudentFeesModal";
 import type { Student } from "../../lib/types";
 
 export default function StudentsPage() {
@@ -12,6 +13,7 @@ export default function StudentsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [resetPasswordStudent, setResetPasswordStudent] = useState<Student | null>(null);
+  const [feesStudent, setFeesStudent] = useState<Student | null>(null);
   const [search, setSearch] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -194,6 +196,12 @@ export default function StudentsPage() {
                             Send SMS
                           </button>
                           <button
+                            onClick={() => setFeesStudent(student as Student)}
+                            className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
+                          >
+                            Manage Fees
+                          </button>
+                          <button
                             onClick={() => setConfirmDeleteId(student.id)}
                             className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:underline transition-colors"
                           >
@@ -221,6 +229,12 @@ export default function StudentsPage() {
         <ResetStudentPasswordModal
           student={resetPasswordStudent}
           onClose={() => setResetPasswordStudent(null)}
+        />
+      )}
+      {feesStudent && (
+        <StudentFeesModal
+          student={feesStudent}
+          onClose={() => setFeesStudent(null)}
         />
       )}
     </div>

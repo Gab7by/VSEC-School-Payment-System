@@ -110,6 +110,30 @@ const _schema = i.schema({
         label: "individualFees",
       },
     },
+    feeTypeExcludedStudents: {
+      forward: {
+        on: "feeTypes",
+        has: "many",
+        label: "excludedStudents",
+      },
+      reverse: {
+        on: "students",
+        has: "many",
+        label: "excludedFromFees",
+      },
+    },
+    feeTypeOverrideSource: {
+      forward: {
+        on: "feeTypes",
+        has: "one",
+        label: "overridesFeeType",
+      },
+      reverse: {
+        on: "feeTypes",
+        has: "many",
+        label: "overriddenBy",
+      },
+    },
   },
 });
 

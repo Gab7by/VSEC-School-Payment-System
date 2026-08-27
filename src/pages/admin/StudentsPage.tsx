@@ -6,6 +6,7 @@ import AddStudentModal from "../../components/admin/AddStudentModal";
 import ChangeClassModal from "../../components/admin/ChangeClassModal";
 import ResetStudentPasswordModal from "../../components/admin/ResetStudentPasswordModal";
 import StudentFeesModal from "../../components/admin/StudentFeesModal";
+import StudentIdCardModal from "../../components/admin/StudentIdCardModal";
 import type { Student } from "../../lib/types";
 
 export default function StudentsPage() {
@@ -14,6 +15,7 @@ export default function StudentsPage() {
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [resetPasswordStudent, setResetPasswordStudent] = useState<Student | null>(null);
   const [feesStudent, setFeesStudent] = useState<Student | null>(null);
+  const [idCardStudent, setIdCardStudent] = useState<Student | null>(null);
   const [search, setSearch] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -202,6 +204,12 @@ export default function StudentsPage() {
                             Manage Fees
                           </button>
                           <button
+                            onClick={() => setIdCardStudent(student as Student)}
+                            className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
+                          >
+                            ID Card
+                          </button>
+                          <button
                             onClick={() => setConfirmDeleteId(student.id)}
                             className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:underline transition-colors"
                           >
@@ -235,6 +243,12 @@ export default function StudentsPage() {
         <StudentFeesModal
           student={feesStudent}
           onClose={() => setFeesStudent(null)}
+        />
+      )}
+      {idCardStudent && (
+        <StudentIdCardModal
+          student={idCardStudent}
+          onClose={() => setIdCardStudent(null)}
         />
       )}
     </div>

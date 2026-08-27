@@ -15,6 +15,7 @@ import {
 import type { Student } from "../../lib/types";
 import Modal from "../ui/Modal";
 import Select from "../ui/Select";
+import Input from "../ui/Input";
 import Button from "../ui/Button";
 
 type Props = {
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export default function ChangeClassModal({ student, onClose }: Props) {
+  const [fullName, setFullName] = useState(student.fullName ?? "");
   const [schoolType, setSchoolType] = useState<SchoolType>(
     student.schoolType as SchoolType
   );
@@ -40,6 +42,10 @@ export default function ChangeClassModal({ student, onClose }: Props) {
     e.preventDefault();
     setError("");
 
+    if (!fullName.trim()) {
+      setError("Please enter the student's full name.");
+      return;
+    }
     if (!classLevel) {
       setError("Please select a class.");
       return;
@@ -53,6 +59,7 @@ export default function ChangeClassModal({ student, onClose }: Props) {
     try {
       await db.transact(
         db.tx.students[student.id].update({
+          fullName: fullName.trim(),
           schoolType,
           classLevel,
           campus: isVsec ? campus : "",
@@ -71,8 +78,7 @@ export default function ChangeClassModal({ student, onClose }: Props) {
   return (
     <Modal title="Edit Enrollment" onClose={onClose}>
       <div className="mb-4 bg-gray-50 rounded-lg p-3 text-sm">
-        <p className="font-medium text-gray-800">{student.fullName}</p>
-        <p className="text-gray-500 text-xs mt-0.5">{student.studentId}</p>
+        <p className="text-gray-500 text-xs">{student.studentId}</p>
         <p className="text-gray-500 text-xs">
           Current: {student.schoolType}
           {student.campus ? ` — ${student.campus}` : ""}
@@ -83,6 +89,15 @@ export default function ChangeClassModal({ student, onClose }: Props) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Full Name"
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="e.g. Kwame Asante"
+          disabled={loading}
+        />
+
         <Select
           label="School Type"
           value={schoolType}

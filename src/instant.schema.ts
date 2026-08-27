@@ -45,6 +45,7 @@ const _schema = i.schema({
       allStudyModes: i.boolean().optional(),
       nationalityGroup: i.string().indexed().optional(),
       term: i.string().indexed(),
+      allTerms: i.boolean().optional(),
       createdAt: i.number().indexed(),
     }),
     payments: i.entity({

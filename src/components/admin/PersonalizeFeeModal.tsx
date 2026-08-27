@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { db } from "../../lib/db";
 import { id } from "@instantdb/react";
-import { TERMS_BY_SCHOOL, type SchoolType, type Term } from "../../lib/constants";
+import { TERMS_BY_SCHOOL, ALL_TERMS_LABEL, type SchoolType, type Term } from "../../lib/constants";
 import type { FeeTypeForStudent, Student } from "../../lib/types";
 import Modal from "../ui/Modal";
 import Select from "../ui/Select";
@@ -20,7 +20,10 @@ export default function PersonalizeFeeModal({ generalFee, student, existingPayme
   const [feeName, setFeeName] = useState(generalFee.feeName ?? "");
   const [amount, setAmount] = useState(String(generalFee.amount ?? ""));
   const [description, setDescription] = useState(generalFee.description ?? "");
-  const [term, setTerm] = useState<Term | "">((generalFee.term as Term) ?? "");
+  const [term, setTerm] = useState<Term | "">(
+    generalFee.allTerms ? "" : ((generalFee.term as Term) ?? "")
+  );
+  const [applyAllTerms, setApplyAllTerms] = useState(!!generalFee.allTerms);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +36,7 @@ export default function PersonalizeFeeModal({ generalFee, student, existingPayme
     e.preventDefault();
     setError("");
 
-    if (!feeName.trim() || !amount || !term) {
+    if (!feeName.trim() || !amount || (!applyAllTerms && !term)) {
       setError("Fee name, amount, and term are required.");
       return;
     }
@@ -64,7 +67,8 @@ export default function PersonalizeFeeModal({ generalFee, student, existingPayme
             studyMode: generalFee.studyMode ?? "",
             allStudyModes: false,
             nationalityGroup: generalFee.nationalityGroup ?? "",
-            term,
+            term: applyAllTerms ? ALL_TERMS_LABEL : term,
+            allTerms: applyAllTerms,
             createdAt: Date.now(),
           })
           .link({ assignedStudent: student.id })
@@ -91,17 +95,35 @@ export default function PersonalizeFeeModal({ generalFee, student, existingPayme
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Select
-          label="Term"
-          value={term}
-          onChange={(e) => setTerm(e.target.value as Term)}
-          placeholder="Select term"
-          disabled={loading}
-        >
-          {termOptions.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </Select>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-slate-700">Term</label>
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={applyAllTerms}
+                onChange={(e) => {
+                  setApplyAllTerms(e.target.checked);
+                  setTerm("");
+                }}
+                disabled={loading}
+                style={{ accentColor: "var(--color-primary)" }}
+                className="w-3.5 h-3.5 rounded"
+              />
+              Apply to all terms
+            </label>
+          </div>
+          <Select
+            value={term}
+            onChange={(e) => setTerm(e.target.value as Term)}
+            placeholder="Select term"
+            disabled={loading || applyAllTerms}
+          >
+            {termOptions.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </Select>
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-slate-700">Fee Name</label>

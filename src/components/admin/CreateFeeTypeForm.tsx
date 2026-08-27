@@ -12,6 +12,7 @@ import {
   ALL_CLASSES_LABEL,
   ALL_CAMPUSES_LABEL,
   ALL_STUDY_MODES_LABEL,
+  ALL_TERMS_LABEL,
   getCurrency,
   type SchoolType,
   type Term,
@@ -34,6 +35,7 @@ export default function CreateFeeTypeForm() {
   const [applyAllClasses, setApplyAllClasses] = useState(false);
   const [applyAllCampuses, setApplyAllCampuses] = useState(false);
   const [applyAllStudyModes, setApplyAllStudyModes] = useState(false);
+  const [applyAllTerms, setApplyAllTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -55,7 +57,13 @@ export default function CreateFeeTypeForm() {
     setError("");
     setSuccess(false);
 
-    if (!feeName.trim() || !amount || !schoolType || (!applyAllClasses && !classLevel) || !term) {
+    if (
+      !feeName.trim() ||
+      !amount ||
+      !schoolType ||
+      (!applyAllClasses && !classLevel) ||
+      (!applyAllTerms && !term)
+    ) {
       setError("All fields are required.");
       return;
     }
@@ -96,7 +104,8 @@ export default function CreateFeeTypeForm() {
                 allStudyModes: false,
                 nationalityGroup: "",
               }),
-          term,
+          term: applyAllTerms ? ALL_TERMS_LABEL : term,
+          allTerms: applyAllTerms,
           createdAt: Date.now(),
         })
       );
@@ -111,6 +120,7 @@ export default function CreateFeeTypeForm() {
       setApplyAllClasses(false);
       setApplyAllCampuses(false);
       setApplyAllStudyModes(false);
+      setApplyAllTerms(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -140,6 +150,7 @@ export default function CreateFeeTypeForm() {
             setApplyAllClasses(false);
             setApplyAllCampuses(false);
             setApplyAllStudyModes(false);
+            setApplyAllTerms(false);
           }}
           placeholder="Select school type"
           disabled={loading}
@@ -255,17 +266,35 @@ export default function CreateFeeTypeForm() {
           </Select>
         </div>
 
-        <Select
-          label="Term"
-          value={term}
-          onChange={(e) => setTerm(e.target.value as Term)}
-          placeholder="Select term"
-          disabled={!schoolType || loading}
-        >
-          {termOptions.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </Select>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-slate-700">Term</label>
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={applyAllTerms}
+                onChange={(e) => {
+                  setApplyAllTerms(e.target.checked);
+                  setTerm("");
+                }}
+                disabled={!schoolType || loading}
+                style={{ accentColor: "var(--color-primary)" }}
+                className="w-3.5 h-3.5 rounded"
+              />
+              Apply to all terms
+            </label>
+          </div>
+          <Select
+            value={term}
+            onChange={(e) => setTerm(e.target.value as Term)}
+            placeholder="Select term"
+            disabled={!schoolType || loading || applyAllTerms}
+          >
+            {termOptions.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </Select>
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-slate-700">Fee Name</label>

@@ -22,6 +22,7 @@ type FeeType = {
   allStudyModes?: boolean;
   nationalityGroup?: string;
   term?: string;
+  allTerms?: boolean;
   assignedStudent?: { id: string } | null;
   excludedStudents?: { id: string }[] | null;
 };
@@ -66,7 +67,7 @@ export default function MakePaymentForm() {
   const matchingFeeTypes = useMemo(() => {
     if (!selectedTerm || !student) return [];
     return allFeeTypes.filter((ft) => {
-      if (ft.term !== selectedTerm) return false;
+      if (!ft.allTerms && ft.term !== selectedTerm) return false;
       return feeMatchesStudent(ft, student);
     });
   }, [selectedTerm, allFeeTypes, student]);

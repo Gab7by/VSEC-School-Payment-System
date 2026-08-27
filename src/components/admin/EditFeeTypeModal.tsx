@@ -11,6 +11,7 @@ import {
   ALL_CLASSES_LABEL,
   ALL_CAMPUSES_LABEL,
   ALL_STUDY_MODES_LABEL,
+  ALL_TERMS_LABEL,
   type SchoolType,
   type Term,
   type VsecNationalityGroup,
@@ -33,7 +34,10 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
   const [feeName, setFeeName] = useState(feeType.feeName ?? "");
   const [amount, setAmount] = useState(String(feeType.amount ?? ""));
   const [description, setDescription] = useState(feeType.description ?? "");
-  const [term, setTerm] = useState<Term | "">((feeType.term as Term) ?? "");
+  const [applyAllTerms, setApplyAllTerms] = useState(!!feeType.allTerms);
+  const [term, setTerm] = useState<Term | "">(
+    feeType.allTerms ? "" : ((feeType.term as Term) ?? "")
+  );
 
   const [schoolType, setSchoolType] = useState<SchoolType | "">(
     (feeType.schoolType as SchoolType) ?? ""
@@ -67,7 +71,7 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
     e.preventDefault();
     setError("");
 
-    if (!feeName.trim() || !amount || !term) {
+    if (!feeName.trim() || !amount || (!applyAllTerms && !term)) {
       setError("Fee name, amount, and term are required.");
       return;
     }
@@ -100,7 +104,8 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
                 feeName: feeName.trim(),
                 amount: numAmount,
                 description: description.trim() || "",
-                term,
+                term: applyAllTerms ? ALL_TERMS_LABEL : term,
+                allTerms: applyAllTerms,
               }
             : {
                 feeName: feeName.trim(),
@@ -124,7 +129,8 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
                       allStudyModes: false,
                       nationalityGroup: "",
                     }),
-                term,
+                term: applyAllTerms ? ALL_TERMS_LABEL : term,
+                allTerms: applyAllTerms,
               }
         )
       );
@@ -165,6 +171,7 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
                 setApplyAllClasses(false);
                 setApplyAllCampuses(false);
                 setApplyAllStudyModes(false);
+                setApplyAllTerms(false);
               }}
               placeholder="Select school type"
               disabled={loading}
@@ -282,17 +289,35 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
           </>
         )}
 
-        <Select
-          label="Term"
-          value={term}
-          onChange={(e) => setTerm(e.target.value as Term)}
-          placeholder="Select term"
-          disabled={loading || (!isIndividual && !schoolType)}
-        >
-          {termOptions.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </Select>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-slate-700">Term</label>
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={applyAllTerms}
+                onChange={(e) => {
+                  setApplyAllTerms(e.target.checked);
+                  setTerm("");
+                }}
+                disabled={loading || (!isIndividual && !schoolType)}
+                style={{ accentColor: "var(--color-primary)" }}
+                className="w-3.5 h-3.5 rounded"
+              />
+              Apply to all terms
+            </label>
+          </div>
+          <Select
+            value={term}
+            onChange={(e) => setTerm(e.target.value as Term)}
+            placeholder="Select term"
+            disabled={loading || (!isIndividual && !schoolType) || applyAllTerms}
+          >
+            {termOptions.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </Select>
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-slate-700">Fee Name</label>

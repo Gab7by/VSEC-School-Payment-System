@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { db } from "../../lib/db";
 import { id } from "@instantdb/react";
-import { TERMS_BY_SCHOOL, type SchoolType, type Term } from "../../lib/constants";
+import { TERMS_BY_SCHOOL, ALL_TERMS_LABEL, type SchoolType, type Term } from "../../lib/constants";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
 
@@ -14,6 +14,7 @@ export default function AssignIndividualFeeForm() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [term, setTerm] = useState<Term | "">("");
+  const [applyAllTerms, setApplyAllTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -46,7 +47,7 @@ export default function AssignIndividualFeeForm() {
       setError("Please select a student.");
       return;
     }
-    if (!feeName.trim() || !amount || !term) {
+    if (!feeName.trim() || !amount || (!applyAllTerms && !term)) {
       setError("Fee name, amount, and term are required.");
       return;
     }
@@ -72,7 +73,8 @@ export default function AssignIndividualFeeForm() {
             studyMode: selectedStudent.studyMode ?? "",
             allStudyModes: false,
             nationalityGroup: selectedStudent.nationalityGroup ?? "",
-            term,
+            term: applyAllTerms ? ALL_TERMS_LABEL : term,
+            allTerms: applyAllTerms,
             createdAt: Date.now(),
           })
           .link({ assignedStudent: selectedStudent.id })
@@ -83,6 +85,7 @@ export default function AssignIndividualFeeForm() {
       setAmount("");
       setDescription("");
       setTerm("");
+      setApplyAllTerms(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -138,17 +141,35 @@ export default function AssignIndividualFeeForm() {
           )}
         </div>
 
-        <Select
-          label="Term"
-          value={term}
-          onChange={(e) => setTerm(e.target.value as Term)}
-          placeholder="Select term"
-          disabled={!selectedStudent || loading}
-        >
-          {termOptions.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </Select>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-slate-700">Term</label>
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={applyAllTerms}
+                onChange={(e) => {
+                  setApplyAllTerms(e.target.checked);
+                  setTerm("");
+                }}
+                disabled={!selectedStudent || loading}
+                style={{ accentColor: "var(--color-primary)" }}
+                className="w-3.5 h-3.5 rounded"
+              />
+              Apply to all terms
+            </label>
+          </div>
+          <Select
+            value={term}
+            onChange={(e) => setTerm(e.target.value as Term)}
+            placeholder="Select term"
+            disabled={!selectedStudent || loading || applyAllTerms}
+          >
+            {termOptions.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </Select>
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-slate-700">Fee Name</label>

@@ -9,6 +9,80 @@ type Props = {
 const CARD_WIDTH = 650;
 const CARD_HEIGHT = 410;
 
+function EmvChip() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 118,
+        right: 24,
+        width: 52,
+        height: 38,
+        borderRadius: 7,
+        background:
+          "linear-gradient(135deg, #f6e2a1 0%, #d9b45c 35%, #a9781f 70%, #8a6015 100%)",
+        border: "1px solid rgba(120,90,20,0.6)",
+        boxShadow:
+          "inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.2)",
+        overflow: "hidden",
+      }}
+    >
+      {/* contact-pad grid lines */}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: "50%",
+          height: 1.5,
+          background: "rgba(90,65,10,0.45)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: "33%",
+          width: 1.2,
+          background: "rgba(90,65,10,0.35)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: "66%",
+          width: 1.2,
+          background: "rgba(90,65,10,0.35)",
+        }}
+      />
+      {/* small extra contact pad */}
+      <div
+        style={{
+          position: "absolute",
+          left: 4,
+          top: 4,
+          width: 10,
+          height: 7,
+          borderRadius: 2,
+          background: "rgba(90,65,10,0.25)",
+        }}
+      />
+      {/* diagonal gloss */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(120deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 40%)",
+        }}
+      />
+    </div>
+  );
+}
+
 function Row({
   label,
   value,
@@ -89,6 +163,8 @@ const StudentIdCard = forwardRef<HTMLDivElement, Props>(function StudentIdCard(
           objectFit: "contain",
         }}
       />
+
+      <EmvChip />
 
       {/* Header band */}
       <div

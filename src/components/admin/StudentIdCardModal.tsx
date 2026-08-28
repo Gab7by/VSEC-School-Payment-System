@@ -5,6 +5,7 @@ import type { Student } from "../../lib/types";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 import StudentIdCard from "./StudentIdCard";
+import StudentIdCardBack from "./StudentIdCardBack";
 import ChangeClassModal from "./ChangeClassModal";
 
 type Props = {
@@ -13,9 +14,10 @@ type Props = {
 };
 
 export default function StudentIdCardModal({ student, onClose }: Props) {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const frontRef = useRef<HTMLDivElement>(null);
+  const backRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const [downloading, setDownloading] = useState<"front" | "back" | null>(null);
   const [error, setError] = useState("");
 
   const { data } = db.useQuery({
@@ -23,12 +25,13 @@ export default function StudentIdCardModal({ student, onClose }: Props) {
   });
   const liveStudent = data?.students?.[0] ?? student;
 
-  async function handleDownload() {
-    if (!cardRef.current) return;
+  async function handleDownload(side: "front" | "back") {
+    const node = side === "front" ? frontRef.current : backRef.current;
+    if (!node) return;
     setError("");
-    setDownloading(true);
+    setDownloading(side);
     try {
-      const canvas = await html2canvas(cardRef.current, {
+      const canvas = await html2canvas(node, {
         scale: 3,
         useCORS: true,
         backgroundColor: "#ffffff",
@@ -36,23 +39,37 @@ export default function StudentIdCardModal({ student, onClose }: Props) {
       const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = `${liveStudent.studentId}-id-card.jpg`;
+      link.download = `${liveStudent.studentId}-id-card-${side}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate the ID card image.");
     } finally {
-      setDownloading(false);
+      setDownloading(null);
     }
   }
 
   return (
     <>
       <Modal title="Student ID Card" onClose={onClose} maxWidth="max-w-3xl">
-        <div className="flex flex-col items-center gap-5">
-          <div className="overflow-x-auto max-w-full">
-            <StudentIdCard ref={cardRef} student={liveStudent as Student} />
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-full flex flex-col items-center gap-2">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider self-start ml-1">
+              Front
+            </span>
+            <div className="overflow-x-auto max-w-full">
+              <StudentIdCard ref={frontRef} student={liveStudent as Student} />
+            </div>
+          </div>
+
+          <div className="w-full flex flex-col items-center gap-2">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider self-start ml-1">
+              Back
+            </span>
+            <div className="overflow-x-auto max-w-full">
+              <StudentIdCardBack ref={backRef} student={liveStudent as Student} />
+            </div>
           </div>
 
           {error && (
@@ -65,8 +82,21 @@ export default function StudentIdCardModal({ student, onClose }: Props) {
             <Button variant="secondary" onClick={() => setEditing(true)} className="flex-1">
               Edit
             </Button>
-            <Button onClick={handleDownload} loading={downloading} className="flex-1">
-              Download JPG
+            <Button
+              onClick={() => handleDownload("front")}
+              loading={downloading === "front"}
+              disabled={downloading !== null && downloading !== "front"}
+              className="flex-1"
+            >
+              Download Front
+            </Button>
+            <Button
+              onClick={() => handleDownload("back")}
+              loading={downloading === "back"}
+              disabled={downloading !== null && downloading !== "back"}
+              className="flex-1"
+            >
+              Download Back
             </Button>
           </div>
         </div>

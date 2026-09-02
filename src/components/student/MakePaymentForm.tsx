@@ -97,6 +97,12 @@ export default function MakePaymentForm() {
     amount: Math.round(amountNum * 100),
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string,
     currency: currency === "USD" ? "USD" : "GHS",
+    metadata: {
+      custom_fields: [],
+      studentId: session?.id ?? "",
+      feeTypeId: selectedFeeType?.id ?? "",
+      term: selectedTerm,
+    },
   });
 
   function handlePayWithPaystack() {
@@ -151,7 +157,9 @@ export default function MakePaymentForm() {
           setSelectedFeeTypeId("");
           setAmountToPay("");
         } catch {
-          setPaystackError("Payment received but failed to record. Please contact admin.");
+          setPaystackError(
+            "Your payment was received by Paystack. It may take a moment to reflect here — refresh in a minute, or contact admin if it doesn't appear."
+          );
         } finally {
           setLoading(false);
         }

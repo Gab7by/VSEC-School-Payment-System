@@ -8,10 +8,21 @@
 // transactionId first) so it's safe to run alongside the client-side write
 // rather than replacing it — the normal case is the client already wrote the
 // record and this just no-ops moments later.
+// Deliberately does NOT import ../src/instant.schema — Vercel's Node.js
+// function build compiles each api/*.ts file individually rather than
+// bundling its full dependency graph, and cross-directory relative imports
+// end up unresolved at runtime (confirmed: ERR_MODULE_NOT_FOUND in
+// production logs). The schema is only used to make @instantdb/admin
+// resolve "has one" links (like payments->feeType below) as a single object
+// instead of a one-item array; omitting it means we handle both shapes
+// ourselves via unwrapOne() instead, avoiding the cross-directory import.
 import { init, id, tx } from "@instantdb/admin";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { IncomingMessage } from "node:http";
-import schema from "../src/instant.schema";
+
+function unwrapOne<T>(value: T | T[] | null | undefined): T | undefined {
+  return Array.isArray(value) ? value[0] : (value ?? undefined);
+}
 
 // Minimal request/response typing matching Vercel's Node.js runtime shape,
 // same rationale as api/send-sms.ts — but this handler needs the raw,
@@ -107,7 +118,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const db = init({
     appId: process.env.VITE_INSTANT_APP_ID as string,
     adminToken: process.env.INSTANT_APP_ADMIN_TOKEN as string,
-    schema,
   });
 
   try {
@@ -131,7 +141,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     const alreadyPaid = (student.payments ?? [])
-      .filter((p) => p.feeType?.id === feeTypeId)
+      .filter((p) => unwrapOne(p.feeType)?.id === feeTypeId)
       .reduce((sum, p) => sum + (p.amountPaid ?? 0), 0);
     const remainingBalance = Math.max(0, (feeType.amount ?? 0) - alreadyPaid);
     const amountPaid = amount / 100;

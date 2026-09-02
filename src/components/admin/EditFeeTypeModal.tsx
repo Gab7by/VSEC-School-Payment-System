@@ -12,9 +12,12 @@ import {
   ALL_CAMPUSES_LABEL,
   ALL_STUDY_MODES_LABEL,
   ALL_TERMS_LABEL,
+  ALL_STUDENT_TYPES_LABEL,
+  STUDENT_TYPES,
   type SchoolType,
   type Term,
   type VsecNationalityGroup,
+  type StudentType,
 } from "../../lib/constants";
 import type { FeeTypeWithStudent } from "../../lib/types";
 import Modal from "../ui/Modal";
@@ -55,6 +58,10 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
   const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">(
     (feeType.nationalityGroup as VsecNationalityGroup) ?? ""
   );
+  const [applyAllStudentTypes, setApplyAllStudentTypes] = useState(!!feeType.allStudentTypes);
+  const [studentType, setStudentType] = useState<StudentType | "">(
+    feeType.allStudentTypes ? "" : ((feeType.studentType as StudentType) ?? "")
+  );
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,6 +100,10 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
         setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
         return;
       }
+      if (!isVsec && schoolType && !applyAllStudentTypes && !studentType) {
+        setError("Student Type is required for Donkor Kids Talent International School.");
+        return;
+      }
     }
 
     setLoading(true);
@@ -121,6 +132,8 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
                       allCampuses: applyAllCampuses,
                       allStudyModes: applyAllStudyModes,
                       nationalityGroup,
+                      studentType: "",
+                      allStudentTypes: false,
                     }
                   : {
                       campus: "",
@@ -128,6 +141,8 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
                       allCampuses: false,
                       allStudyModes: false,
                       nationalityGroup: "",
+                      studentType: applyAllStudentTypes ? ALL_STUDENT_TYPES_LABEL : studentType,
+                      allStudentTypes: applyAllStudentTypes,
                     }),
                 term: applyAllTerms ? ALL_TERMS_LABEL : term,
                 allTerms: applyAllTerms,
@@ -167,10 +182,12 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
                 setCampus("");
                 setStudyMode("");
                 setNationalityGroup("");
+                setStudentType("");
                 setTerm("");
                 setApplyAllClasses(false);
                 setApplyAllCampuses(false);
                 setApplyAllStudyModes(false);
+                setApplyAllStudentTypes(false);
                 setApplyAllTerms(false);
               }}
               placeholder="Select school type"
@@ -255,6 +272,38 @@ export default function EditFeeTypeModal({ feeType, onClose }: Props) {
                   ))}
                 </Select>
               </>
+            )}
+
+            {!isVsec && schoolType && (
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-slate-700">Student Type</label>
+                  <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={applyAllStudentTypes}
+                      onChange={(e) => {
+                        setApplyAllStudentTypes(e.target.checked);
+                        setStudentType("");
+                      }}
+                      disabled={loading}
+                      style={{ accentColor: "var(--color-primary)" }}
+                      className="w-3.5 h-3.5 rounded"
+                    />
+                    Apply to all student types
+                  </label>
+                </div>
+                <Select
+                  value={studentType}
+                  onChange={(e) => setStudentType(e.target.value as StudentType)}
+                  placeholder="Select student type"
+                  disabled={loading || applyAllStudentTypes}
+                >
+                  {STUDENT_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </Select>
+              </div>
             )}
 
             <div className="flex flex-col gap-1.5">

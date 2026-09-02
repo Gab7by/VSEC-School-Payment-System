@@ -151,10 +151,14 @@ export default function StudentsPage() {
                     <td className="px-5 py-3.5 text-slate-500 text-xs">{student.phone}</td>
                     <td className="px-5 py-3.5">
                       <p className="text-sm text-slate-700 font-medium">{student.classLevel}</p>
-                      {student.schoolType === VSEC_SCHOOL && (
+                      {student.schoolType === VSEC_SCHOOL ? (
                         <p className="text-xs text-slate-400 mt-0.5">
                           {[student.campus, student.studyMode, student.nationalityGroup].filter(Boolean).join(" · ") || "—"}
                         </p>
+                      ) : (
+                        student.studentType && (
+                          <p className="text-xs text-slate-400 mt-0.5">{student.studentType}</p>
+                        )
                       )}
                     </td>
                     <td className="px-5 py-3.5 whitespace-nowrap">

@@ -13,10 +13,12 @@ import {
   VSEC_CAMPUSES,
   VSEC_STUDY_MODES,
   VSEC_NATIONALITY_GROUPS,
+  STUDENT_TYPES,
   type SchoolType,
   type VsecCampus,
   type VsecStudyMode,
   type VsecNationalityGroup,
+  type StudentType,
 } from "../../lib/constants";
 import Modal from "../ui/Modal";
 import Input from "../ui/Input";
@@ -38,6 +40,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
   const [campus, setCampus] = useState<VsecCampus | "">("");
   const [studyMode, setStudyMode] = useState<VsecStudyMode | "">("");
   const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">("");
+  const [studentType, setStudentType] = useState<StudentType | "">("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
@@ -68,6 +71,10 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
       setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
       return;
     }
+    if (!isVsec && schoolType && !studentType) {
+      setError("Student Type is required for Donkor Kids Talent International School.");
+      return;
+    }
     if (existingStudents.some((s) => s.phone === phone.trim())) {
       setError("A student with this phone number already exists.");
       return;
@@ -86,7 +93,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
           phone: phone.trim(),
           schoolType,
           classLevel,
-          ...(isVsec ? { campus, studyMode, nationalityGroup } : {}),
+          ...(isVsec ? { campus, studyMode, nationalityGroup } : { studentType }),
           passwordHash: hash,
           isFirstLogin: true,
           createdAt: Date.now(),
@@ -151,6 +158,12 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
               <div className="flex justify-between">
                 <span className="text-gray-500">Nationality Group</span>
                 <span className="font-medium">{nationalityGroup}</span>
+              </div>
+            )}
+            {!isVsec && studentType && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Student Type</span>
+                <span className="font-medium">{studentType}</span>
               </div>
             )}
             <div className="flex justify-between">
@@ -233,6 +246,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
             setCampus("");
             setStudyMode("");
             setNationalityGroup("");
+            setStudentType("");
           }}
           placeholder="Select school type"
           disabled={loading}
@@ -280,6 +294,20 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
               ))}
             </Select>
           </>
+        )}
+
+        {!isVsec && schoolType && (
+          <Select
+            label="Student Type"
+            value={studentType}
+            onChange={(e) => setStudentType(e.target.value as StudentType)}
+            placeholder="Select student type"
+            disabled={loading}
+          >
+            {STUDENT_TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </Select>
         )}
 
         <Select

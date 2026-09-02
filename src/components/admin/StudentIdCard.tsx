@@ -276,11 +276,13 @@ const StudentIdCard = forwardRef<HTMLDivElement, Props>(function StudentIdCard(
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
           <Row label="Student ID" value={student.studentId} accentColor={theme.accent} />
           <Row label="Class Level" value={student.classLevel} accentColor={theme.accent} />
-          {isVsec && (
+          {isVsec ? (
             <>
               <Row label="Campus" value={student.campus ?? ""} accentColor={theme.accent} />
               <Row label="Nationality" value={student.nationalityGroup ?? ""} accentColor={theme.accent} />
             </>
+          ) : (
+            <Row label="Student Type" value={student.studentType ?? ""} accentColor={theme.accent} />
           )}
         </div>
       </div>

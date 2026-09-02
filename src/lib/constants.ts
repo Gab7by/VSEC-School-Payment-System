@@ -5,6 +5,7 @@ export const SCHOOL_TYPES = [
 export type SchoolType = (typeof SCHOOL_TYPES)[number];
 
 export const VSEC_SCHOOL: SchoolType = "VSEC College of Studies";
+export const DONKOR_KIDS_SCHOOL: SchoolType = "Donkor Kids Talent International School";
 
 export const VSEC_CAMPUSES = [
   "Osu Campus",
@@ -54,6 +55,10 @@ export const ALL_TERMS_LABEL = "All Terms";
 
 export const VSEC_NATIONALITY_GROUPS = ["Ghanaian", "International"] as const;
 export type VsecNationalityGroup = (typeof VSEC_NATIONALITY_GROUPS)[number];
+
+export const STUDENT_TYPES = ["Boarder", "Day Student"] as const;
+export type StudentType = (typeof STUDENT_TYPES)[number];
+export const ALL_STUDENT_TYPES_LABEL = "All Student Types";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for call-site compatibility
 export function getCurrency(_nationalityGroup?: string): "GHS" | "USD" {

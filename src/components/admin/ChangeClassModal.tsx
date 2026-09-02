@@ -7,10 +7,12 @@ import {
   VSEC_CAMPUSES,
   VSEC_STUDY_MODES,
   VSEC_NATIONALITY_GROUPS,
+  STUDENT_TYPES,
   type SchoolType,
   type VsecCampus,
   type VsecStudyMode,
   type VsecNationalityGroup,
+  type StudentType,
 } from "../../lib/constants";
 import type { Student } from "../../lib/types";
 import Modal from "../ui/Modal";
@@ -32,6 +34,7 @@ export default function ChangeClassModal({ student, onClose }: Props) {
   const [campus, setCampus] = useState<VsecCampus | "">((student.campus as VsecCampus) ?? "");
   const [studyMode, setStudyMode] = useState<VsecStudyMode | "">((student.studyMode as VsecStudyMode) ?? "");
   const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">((student.nationalityGroup as VsecNationalityGroup) ?? "");
+  const [studentType, setStudentType] = useState<StudentType | "">((student.studentType as StudentType) ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -54,6 +57,10 @@ export default function ChangeClassModal({ student, onClose }: Props) {
       setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
       return;
     }
+    if (!isVsec && !studentType) {
+      setError("Student Type is required for Donkor Kids Talent International School.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -65,6 +72,7 @@ export default function ChangeClassModal({ student, onClose }: Props) {
           campus: isVsec ? campus : "",
           studyMode: isVsec ? studyMode : "",
           nationalityGroup: isVsec ? nationalityGroup : "",
+          studentType: isVsec ? "" : studentType,
         })
       );
       onClose();
@@ -84,6 +92,7 @@ export default function ChangeClassModal({ student, onClose }: Props) {
           {student.campus ? ` — ${student.campus}` : ""}
           {student.studyMode ? ` — ${student.studyMode}` : ""}
           {(student.nationalityGroup as string | undefined) ? ` — ${student.nationalityGroup}` : ""}
+          {(student.studentType as string | undefined) ? ` — ${student.studentType}` : ""}
           {student.classLevel ? ` — ${student.classLevel}` : ""}
         </p>
       </div>
@@ -107,6 +116,7 @@ export default function ChangeClassModal({ student, onClose }: Props) {
             setCampus("");
             setStudyMode("");
             setNationalityGroup("");
+            setStudentType("");
           }}
           disabled={loading}
         >
@@ -153,6 +163,20 @@ export default function ChangeClassModal({ student, onClose }: Props) {
               ))}
             </Select>
           </>
+        )}
+
+        {!isVsec && (
+          <Select
+            label="Student Type"
+            value={studentType}
+            onChange={(e) => setStudentType(e.target.value as StudentType)}
+            placeholder="Select student type"
+            disabled={loading}
+          >
+            {STUDENT_TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </Select>
         )}
 
         <Select

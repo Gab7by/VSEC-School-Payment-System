@@ -73,6 +73,7 @@ export default function AssignIndividualFeeForm() {
             studyMode: selectedStudent.studyMode ?? "",
             allStudyModes: false,
             nationalityGroup: selectedStudent.nationalityGroup ?? "",
+            studentType: selectedStudent.studentType ?? "",
             term: applyAllTerms ? ALL_TERMS_LABEL : term,
             allTerms: applyAllTerms,
             createdAt: Date.now(),

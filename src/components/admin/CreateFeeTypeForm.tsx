@@ -13,10 +13,13 @@ import {
   ALL_CAMPUSES_LABEL,
   ALL_STUDY_MODES_LABEL,
   ALL_TERMS_LABEL,
+  ALL_STUDENT_TYPES_LABEL,
+  STUDENT_TYPES,
   getCurrency,
   type SchoolType,
   type Term,
   type VsecNationalityGroup,
+  type StudentType,
 } from "../../lib/constants";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
@@ -30,11 +33,13 @@ export default function CreateFeeTypeForm() {
   const [campus, setCampus] = useState("");
   const [studyMode, setStudyMode] = useState("");
   const [nationalityGroup, setNationalityGroup] = useState<VsecNationalityGroup | "">("");
+  const [studentType, setStudentType] = useState<StudentType | "">("");
   const [classLevel, setClassLevel] = useState("");
   const [term, setTerm] = useState<Term | "">("");
   const [applyAllClasses, setApplyAllClasses] = useState(false);
   const [applyAllCampuses, setApplyAllCampuses] = useState(false);
   const [applyAllStudyModes, setApplyAllStudyModes] = useState(false);
+  const [applyAllStudentTypes, setApplyAllStudentTypes] = useState(false);
   const [applyAllTerms, setApplyAllTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -74,6 +79,10 @@ export default function CreateFeeTypeForm() {
       setError("Campus, Study Mode, and Nationality Group are required for VSEC College of Studies.");
       return;
     }
+    if (!isVsec && schoolType && !applyAllStudentTypes && !studentType) {
+      setError("Student Type is required for Donkor Kids Talent International School.");
+      return;
+    }
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
       setError("Amount must be a positive number.");
@@ -96,6 +105,8 @@ export default function CreateFeeTypeForm() {
                 allCampuses: applyAllCampuses,
                 allStudyModes: applyAllStudyModes,
                 nationalityGroup,
+                studentType: "",
+                allStudentTypes: false,
               }
             : {
                 campus: "",
@@ -103,6 +114,8 @@ export default function CreateFeeTypeForm() {
                 allCampuses: false,
                 allStudyModes: false,
                 nationalityGroup: "",
+                studentType: applyAllStudentTypes ? ALL_STUDENT_TYPES_LABEL : studentType,
+                allStudentTypes: applyAllStudentTypes,
               }),
           term: applyAllTerms ? ALL_TERMS_LABEL : term,
           allTerms: applyAllTerms,
@@ -115,11 +128,13 @@ export default function CreateFeeTypeForm() {
       setCampus("");
       setStudyMode("");
       setNationalityGroup("");
+      setStudentType("");
       setClassLevel("");
       setTerm("");
       setApplyAllClasses(false);
       setApplyAllCampuses(false);
       setApplyAllStudyModes(false);
+      setApplyAllStudentTypes(false);
       setApplyAllTerms(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -146,10 +161,12 @@ export default function CreateFeeTypeForm() {
             setCampus("");
             setStudyMode("");
             setNationalityGroup("");
+            setStudentType("");
             setTerm("");
             setApplyAllClasses(false);
             setApplyAllCampuses(false);
             setApplyAllStudyModes(false);
+            setApplyAllStudentTypes(false);
             setApplyAllTerms(false);
           }}
           placeholder="Select school type"
@@ -234,6 +251,38 @@ export default function CreateFeeTypeForm() {
               ))}
             </Select>
           </>
+        )}
+
+        {!isVsec && schoolType && (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-700">Student Type</label>
+              <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={applyAllStudentTypes}
+                  onChange={(e) => {
+                    setApplyAllStudentTypes(e.target.checked);
+                    setStudentType("");
+                  }}
+                  disabled={loading}
+                  style={{ accentColor: "var(--color-primary)" }}
+                  className="w-3.5 h-3.5 rounded"
+                />
+                Apply to all student types
+              </label>
+            </div>
+            <Select
+              value={studentType}
+              onChange={(e) => setStudentType(e.target.value as StudentType)}
+              placeholder="Select student type"
+              disabled={loading || applyAllStudentTypes}
+            >
+              {STUDENT_TYPES.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </Select>
+          </div>
         )}
 
         <div className="flex flex-col gap-1.5">

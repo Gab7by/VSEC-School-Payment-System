@@ -67,6 +67,7 @@ export default function PersonalizeFeeModal({ generalFee, student, existingPayme
             studyMode: generalFee.studyMode ?? "",
             allStudyModes: false,
             nationalityGroup: generalFee.nationalityGroup ?? "",
+            studentType: generalFee.studentType ?? "",
             term: applyAllTerms ? ALL_TERMS_LABEL : term,
             allTerms: applyAllTerms,
             createdAt: Date.now(),

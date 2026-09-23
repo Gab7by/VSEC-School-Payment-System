@@ -49,7 +49,7 @@ const StudentIdCardBack = forwardRef<HTMLDivElement, Props>(function StudentIdCa
         accentDark: "#b8941e",
         noticeTint: "rgba(212,175,55,0.1)",
         notice:
-          "This card belongs to VSEC College of Studies. If found, return to VSEC College of Studies main office at Kumasi (Anloga Junction) or call +233 541 623 059.",
+          "This card belongs to VSEC College of Studies. If found, return to VSEC College of Studies main office in Kumasi (Anloga Junction) or call +233 541 623 059.",
         rows: [
           { label: "Website", value: "vseccollege.com" },
           { label: "Contact", value: "+233 541 623 059" },
@@ -61,7 +61,7 @@ const StudentIdCardBack = forwardRef<HTMLDivElement, Props>(function StudentIdCa
         accentDark: "#0f766e",
         noticeTint: "rgba(15,118,110,0.08)",
         notice:
-          "This card belongs to Donkor Kids Talent International School. If found, return to Donkor Kids Talent International School main office at Kumasi (Appiedu) or call +233 541 623 059.",
+          "This card belongs to Donkor Kids Talent International School. If found, return to Donkor Kids Talent International School main office in Kumasi (Appiedu) or call +233 541 623 059.",
         rows: [
           { label: "Contact", value: "+233 541 623 059" },
           { label: "Office", value: "Kumasi (Appiedu)" },

@@ -29,7 +29,7 @@ export default function LoginPage() {
     setError("");
 
     if (!identifier.trim() || !password) {
-      setError("Please enter your email or phone number, and password.");
+      setError("Please enter your phone number or email, and password.");
       return;
     }
 
@@ -60,12 +60,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-slate-700">Email or Phone Number</label>
+            <label className="text-sm font-medium text-slate-700">Phone Number or Email</label>
             <input
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Enter your email or phone number"
+              placeholder="Enter your phone number or email"
               className={inputCls}
               style={{ "--tw-ring-color": "var(--color-primary)" } as React.CSSProperties}
               disabled={loading}

@@ -7,11 +7,28 @@ import {
 } from "react";
 import { db } from "../lib/db";
 import { hashPassword } from "../lib/utils";
-import type { Session } from "../lib/types";
+import type { Session, Student } from "../lib/types";
 
 const SESSION_KEY = "vsec_session";
 
 type LoginResult = { success: boolean; error?: string };
+
+function buildStudentSession(student: Student): Session {
+  return {
+    id: student.id,
+    role: "student",
+    name: student.fullName,
+    email: student.email,
+    phone: student.phone,
+    studentId: student.studentId,
+    schoolType: student.schoolType,
+    classLevel: student.classLevel,
+    campus: student.campus,
+    studyMode: student.studyMode,
+    nationalityGroup: student.nationalityGroup,
+    isFirstLogin: student.isFirstLogin,
+  };
+}
 
 type AuthContextValue = {
   session: Session | null;
@@ -48,13 +65,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         admins: { $: { where: { email: normalizedEmail } } },
       });
       const admin = adminResult.data.admins?.[0];
-      if (admin && admin.passwordHash === hash) {
-        const s: Session = {
-          id: admin.id,
-          role: "admin",
-          name: admin.name,
-          email: admin.email,
-        };
+      if (admin) {
+        if (admin.passwordHash === hash) {
+          const s: Session = {
+            id: admin.id,
+            role: "admin",
+            name: admin.name,
+            email: admin.email,
+          };
+          localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+          setSession(s);
+          return { success: true };
+        }
+        return { success: false, error: "Invalid email or password." };
+      }
+
+      // No admin owns this email — check if it belongs to a student
+      const studentByEmailResult = await db.queryOnce({
+        students: { $: { where: { email: normalizedEmail } } },
+      });
+      const studentByEmail = studentByEmailResult.data.students?.[0];
+      if (studentByEmail && studentByEmail.passwordHash === hash) {
+        const s = buildStudentSession(studentByEmail);
         localStorage.setItem(SESSION_KEY, JSON.stringify(s));
         setSession(s);
         return { success: true };
@@ -68,19 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     const student = studentResult.data.students?.[0];
     if (student && student.passwordHash === hash) {
-      const s: Session = {
-        id: student.id,
-        role: "student",
-        name: student.fullName,
-        phone: student.phone,
-        studentId: student.studentId,
-        schoolType: student.schoolType,
-        classLevel: student.classLevel,
-        campus: student.campus,
-        studyMode: student.studyMode,
-        nationalityGroup: student.nationalityGroup,
-        isFirstLogin: student.isFirstLogin,
-      };
+      const s = buildStudentSession(student);
       localStorage.setItem(SESSION_KEY, JSON.stringify(s));
       setSession(s);
       return { success: true };

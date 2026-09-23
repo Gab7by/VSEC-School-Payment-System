@@ -23,6 +23,7 @@ const _schema = i.schema({
       studentId: i.string().unique().indexed(),
       fullName: i.string(),
       phone: i.string().unique().indexed(),
+      email: i.string().unique().indexed().optional(),
       schoolType: i.string().indexed(),
       classLevel: i.string().indexed(),
       campus: i.string().indexed().optional(),

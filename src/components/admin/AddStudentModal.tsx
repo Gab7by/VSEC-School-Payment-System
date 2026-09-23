@@ -27,7 +27,7 @@ import Button from "../ui/Button";
 
 type Props = {
   onClose: () => void;
-  existingStudents: Array<{ studentId?: string; schoolType?: string; phone?: string }>;
+  existingStudents: Array<{ studentId?: string; schoolType?: string; phone?: string; email?: string }>;
 };
 type Step = "form" | "success";
 
@@ -35,6 +35,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
   const [step, setStep] = useState<Step>("form");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [schoolType, setSchoolType] = useState<SchoolType | "">("");
   const [classLevel, setClassLevel] = useState("");
   const [campus, setCampus] = useState<VsecCampus | "">("");
@@ -79,9 +80,25 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
       setError("A student with this phone number already exists.");
       return;
     }
+    const normalizedEmail = email.trim().toLowerCase();
+    if (normalizedEmail && existingStudents.some((s) => s.email?.toLowerCase() === normalizedEmail)) {
+      setError("A student with this email address already exists.");
+      return;
+    }
 
     setLoading(true);
     try {
+      if (normalizedEmail) {
+        const adminCheck = await db.queryOnce({
+          admins: { $: { where: { email: normalizedEmail } } },
+        });
+        if (adminCheck.data.admins?.[0]) {
+          setError("This email address is already associated with an admin account.");
+          setLoading(false);
+          return;
+        }
+      }
+
       const password = generatePassword();
       const hash = await hashPassword(password);
       const newId = id();
@@ -91,6 +108,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
           studentId,
           fullName: fullName.trim(),
           phone: phone.trim(),
+          ...(normalizedEmail ? { email: normalizedEmail } : {}),
           schoolType,
           classLevel,
           ...(isVsec ? { campus, studyMode, nationalityGroup } : { studentType }),
@@ -106,7 +124,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to create student. Phone number may already be registered."
+          : "Failed to create student. Phone number or email may already be registered."
       );
     } finally {
       setLoading(false);
@@ -138,6 +156,12 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
               <span className="text-gray-500">Student ID</span>
               <span className="font-mono font-medium">{studentId}</span>
             </div>
+            {email.trim() && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Email</span>
+                <span className="font-medium">{email.trim().toLowerCase()}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-gray-500">School</span>
               <span className="font-medium text-right max-w-[60%]">{schoolType}</span>
@@ -216,6 +240,15 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="e.g. 0244123456"
+          disabled={loading}
+        />
+
+        <Input
+          label="Email Address (optional)"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="e.g. student@example.com"
           disabled={loading}
         />
 

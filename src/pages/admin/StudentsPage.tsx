@@ -4,6 +4,7 @@ import { db } from "../../lib/db";
 import { VSEC_SCHOOL } from "../../lib/constants";
 import AddStudentModal from "../../components/admin/AddStudentModal";
 import ChangeClassModal from "../../components/admin/ChangeClassModal";
+import EditStudentEmailModal from "../../components/admin/EditStudentEmailModal";
 import ResetStudentPasswordModal from "../../components/admin/ResetStudentPasswordModal";
 import StudentFeesModal from "../../components/admin/StudentFeesModal";
 import StudentIdCardModal from "../../components/admin/StudentIdCardModal";
@@ -13,6 +14,7 @@ export default function StudentsPage() {
   const navigate = useNavigate();
   const [showAdd, setShowAdd] = useState(false);
   const [editStudent, setEditStudent] = useState<Student | null>(null);
+  const [emailStudent, setEmailStudent] = useState<Student | null>(null);
   const [resetPasswordStudent, setResetPasswordStudent] = useState<Student | null>(null);
   const [feesStudent, setFeesStudent] = useState<Student | null>(null);
   const [idCardStudent, setIdCardStudent] = useState<Student | null>(null);
@@ -117,6 +119,7 @@ export default function StudentsPage() {
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">School</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone</th>
+                  <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Class / Enrollment</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Action</th>
                 </tr>
@@ -149,6 +152,7 @@ export default function StudentsPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-slate-500 text-xs">{student.phone}</td>
+                    <td className="px-5 py-3.5 text-slate-500 text-xs">{student.email || "—"}</td>
                     <td className="px-5 py-3.5">
                       <p className="text-sm text-slate-700 font-medium">{student.classLevel}</p>
                       {student.schoolType === VSEC_SCHOOL ? (
@@ -188,6 +192,12 @@ export default function StudentsPage() {
                             style={{ color: "var(--color-primary)" }}
                           >
                             Edit Enrollment
+                          </button>
+                          <button
+                            onClick={() => setEmailStudent(student as Student)}
+                            className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
+                          >
+                            Edit Email
                           </button>
                           <button
                             onClick={() => setResetPasswordStudent(student as Student)}
@@ -235,6 +245,13 @@ export default function StudentsPage() {
         <ChangeClassModal
           student={editStudent}
           onClose={() => setEditStudent(null)}
+        />
+      )}
+      {emailStudent && (
+        <EditStudentEmailModal
+          student={emailStudent}
+          existingStudents={students}
+          onClose={() => setEmailStudent(null)}
         />
       )}
       {resetPasswordStudent && (

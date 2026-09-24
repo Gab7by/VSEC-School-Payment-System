@@ -5,19 +5,22 @@ import { VSEC_SCHOOL } from "../../lib/constants";
 import AddStudentModal from "../../components/admin/AddStudentModal";
 import ChangeClassModal from "../../components/admin/ChangeClassModal";
 import EditStudentEmailModal from "../../components/admin/EditStudentEmailModal";
+import EditStudentPhotoModal from "../../components/admin/EditStudentPhotoModal";
 import ResetStudentPasswordModal from "../../components/admin/ResetStudentPasswordModal";
 import StudentFeesModal from "../../components/admin/StudentFeesModal";
 import StudentIdCardModal from "../../components/admin/StudentIdCardModal";
-import type { Student } from "../../lib/types";
+import PhotoPlaceholder from "../../components/ui/PhotoPlaceholder";
+import type { Student, StudentWithPhoto } from "../../lib/types";
 
 export default function StudentsPage() {
   const navigate = useNavigate();
   const [showAdd, setShowAdd] = useState(false);
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [emailStudent, setEmailStudent] = useState<Student | null>(null);
+  const [photoStudent, setPhotoStudent] = useState<StudentWithPhoto | null>(null);
   const [resetPasswordStudent, setResetPasswordStudent] = useState<Student | null>(null);
   const [feesStudent, setFeesStudent] = useState<Student | null>(null);
-  const [idCardStudent, setIdCardStudent] = useState<Student | null>(null);
+  const [idCardStudent, setIdCardStudent] = useState<StudentWithPhoto | null>(null);
   const [search, setSearch] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -43,7 +46,7 @@ export default function StudentsPage() {
   }
 
   const { data, isLoading } = db.useQuery({
-    students: { $: { order: { createdAt: "desc" } } },
+    students: { $: { order: { createdAt: "desc" } }, photo: {} },
   });
 
   const students = data?.students ?? [];
@@ -116,6 +119,7 @@ export default function StudentsPage() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Student ID</th>
+                  <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Photo</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">School</th>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone</th>
@@ -135,6 +139,15 @@ export default function StudentsPage() {
                   >
                     <td className="px-5 py-3.5 font-mono text-xs text-slate-500 whitespace-nowrap">
                       {student.studentId}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <div style={{ width: 32, height: 42, borderRadius: 4, overflow: "hidden", border: "1px solid #e2e8f0" }}>
+                        {student.photo?.url ? (
+                          <img src={student.photo.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          <PhotoPlaceholder iconSize={16} />
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-3.5 font-semibold text-slate-900">
                       {student.fullName}
@@ -200,6 +213,12 @@ export default function StudentsPage() {
                             Edit Email
                           </button>
                           <button
+                            onClick={() => setPhotoStudent(student as StudentWithPhoto)}
+                            className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
+                          >
+                            Edit Photo
+                          </button>
+                          <button
                             onClick={() => setResetPasswordStudent(student as Student)}
                             className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
                           >
@@ -218,7 +237,7 @@ export default function StudentsPage() {
                             Manage Fees
                           </button>
                           <button
-                            onClick={() => setIdCardStudent(student as Student)}
+                            onClick={() => setIdCardStudent(student as StudentWithPhoto)}
                             className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline transition-colors"
                           >
                             ID Card
@@ -252,6 +271,12 @@ export default function StudentsPage() {
           student={emailStudent}
           existingStudents={students}
           onClose={() => setEmailStudent(null)}
+        />
+      )}
+      {photoStudent && (
+        <EditStudentPhotoModal
+          student={photoStudent}
+          onClose={() => setPhotoStudent(null)}
         />
       )}
       {resetPasswordStudent && (

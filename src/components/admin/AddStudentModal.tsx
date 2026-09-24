@@ -24,6 +24,8 @@ import Modal from "../ui/Modal";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
+import PhotoPlaceholder from "../ui/PhotoPlaceholder";
+import ImageCropper from "./ImageCropper";
 
 type Props = {
   onClose: () => void;
@@ -46,6 +48,31 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
   const [loading, setLoading] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
   const [copied, setCopied] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [photoBlob, setPhotoBlob] = useState<Blob | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+
+  function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    setError("");
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Image must be smaller than 8MB.");
+      return;
+    }
+    setCropSrc(URL.createObjectURL(file));
+  }
+
+  function handlePhotoCropComplete(blob: Blob) {
+    setPhotoBlob(blob);
+    setPhotoPreviewUrl(URL.createObjectURL(blob));
+    setCropSrc(null);
+  }
 
   const studentId = useMemo(() => {
     if (!schoolType || !classLevel) return "";
@@ -103,20 +130,25 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
       const hash = await hashPassword(password);
       const newId = id();
 
-      await db.transact(
-        db.tx.students[newId].update({
-          studentId,
-          fullName: fullName.trim(),
-          phone: phone.trim(),
-          ...(normalizedEmail ? { email: normalizedEmail } : {}),
-          schoolType,
-          classLevel,
-          ...(isVsec ? { campus, studyMode, nationalityGroup } : { studentType }),
-          passwordHash: hash,
-          isFirstLogin: true,
-          createdAt: Date.now(),
-        })
-      );
+      let photoFileId: string | undefined;
+      if (photoBlob) {
+        const { data } = await db.storage.uploadFile(`students/${newId}/photo.jpg`, photoBlob);
+        photoFileId = data.id;
+      }
+
+      const updateTx = db.tx.students[newId].update({
+        studentId,
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        ...(normalizedEmail ? { email: normalizedEmail } : {}),
+        schoolType,
+        classLevel,
+        ...(isVsec ? { campus, studyMode, nationalityGroup } : { studentType }),
+        passwordHash: hash,
+        isFirstLogin: true,
+        createdAt: Date.now(),
+      });
+      await db.transact(photoFileId ? updateTx.link({ photo: photoFileId }) : updateTx);
 
       setGeneratedPassword(password);
       setStep("success");
@@ -147,6 +179,14 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
+            {photoPreviewUrl && (
+              <div
+                className="mx-auto mb-3"
+                style={{ width: 66, height: 88, borderRadius: 6, overflow: "hidden", border: "1px solid #e5e7eb" }}
+              >
+                <img src={photoPreviewUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
+            )}
             <p className="font-semibold text-gray-900">{fullName}</p>
             <p className="text-sm text-gray-500">{phone}</p>
           </div>
@@ -223,6 +263,7 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
   }
 
   return (
+    <>
     <Modal title="Add Student" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
@@ -251,6 +292,41 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
           placeholder="e.g. student@example.com"
           disabled={loading}
         />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Upload Student Photo <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <div className="flex items-center gap-3">
+            <div
+              style={{ width: 60, height: 80, borderRadius: 6, overflow: "hidden", border: "1px solid #e5e7eb", flexShrink: 0 }}
+            >
+              {photoPreviewUrl ? (
+                <img src={photoPreviewUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <PhotoPlaceholder iconSize={24} />
+              )}
+            </div>
+            <div className="flex-1">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handlePhotoSelect}
+                disabled={loading}
+                className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+              />
+              {photoBlob && (
+                <button
+                  type="button"
+                  onClick={() => { setPhotoBlob(null); setPhotoPreviewUrl(null); }}
+                  className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:underline transition-colors mt-1"
+                >
+                  Remove selected photo
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -371,5 +447,14 @@ export default function AddStudentModal({ onClose, existingStudents }: Props) {
         </div>
       </form>
     </Modal>
+
+    {cropSrc && (
+      <ImageCropper
+        imageSrc={cropSrc}
+        onCancel={() => setCropSrc(null)}
+        onCropComplete={handlePhotoCropComplete}
+      />
+    )}
+    </>
   );
 }

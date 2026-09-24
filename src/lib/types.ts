@@ -18,6 +18,12 @@ export type StudentWithPayments = InstaQLEntity<
   { payments: { feeType: object } }
 >;
 
+export type StudentWithPhoto = InstaQLEntity<
+  AppSchema,
+  "students",
+  { photo: object }
+>;
+
 export type FeeTypeWithStudent = InstaQLEntity<
   AppSchema,
   "feeTypes",

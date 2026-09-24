@@ -5,9 +5,15 @@ import { hashPassword } from "../../lib/utils";
 import { VSEC_SCHOOL } from "../../lib/constants";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
+import PhotoPlaceholder from "../../components/ui/PhotoPlaceholder";
 
 export default function ProfilePage() {
   const { session, refreshSession } = useAuth();
+
+  const { data: photoData } = db.useQuery({
+    students: { $: { where: { id: session?.id ?? "" } }, photo: {} },
+  });
+  const studentPhoto = photoData?.students?.[0]?.photo;
 
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(session?.name ?? "");
@@ -141,6 +147,18 @@ export default function ProfilePage() {
               Edit Name
             </button>
           )}
+        </div>
+
+        <div className="flex justify-center mb-5">
+          <div
+            style={{ width: 90, height: 120, borderRadius: 8, overflow: "hidden", border: "1px solid #e2e8f0" }}
+          >
+            {studentPhoto?.url ? (
+              <img src={studentPhoto.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <PhotoPlaceholder iconSize={36} />
+            )}
+          </div>
         </div>
 
         <div className="space-y-1 text-sm">

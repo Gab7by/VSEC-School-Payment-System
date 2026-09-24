@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { db } from "../../lib/db";
-import type { Student } from "../../lib/types";
+import type { StudentWithPhoto } from "../../lib/types";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 import StudentIdCard from "./StudentIdCard";
@@ -9,7 +9,7 @@ import StudentIdCardBack from "./StudentIdCardBack";
 import ChangeClassModal from "./ChangeClassModal";
 
 type Props = {
-  student: Student;
+  student: StudentWithPhoto;
   onClose: () => void;
 };
 
@@ -21,7 +21,7 @@ export default function StudentIdCardModal({ student, onClose }: Props) {
   const [error, setError] = useState("");
 
   const { data } = db.useQuery({
-    students: { $: { where: { id: student.id } } },
+    students: { $: { where: { id: student.id } }, photo: {} },
   });
   const liveStudent = data?.students?.[0] ?? student;
 
@@ -59,7 +59,7 @@ export default function StudentIdCardModal({ student, onClose }: Props) {
               Front
             </span>
             <div className="overflow-x-auto max-w-full">
-              <StudentIdCard ref={frontRef} student={liveStudent as Student} />
+              <StudentIdCard ref={frontRef} student={liveStudent as StudentWithPhoto} />
             </div>
           </div>
 
@@ -68,7 +68,7 @@ export default function StudentIdCardModal({ student, onClose }: Props) {
               Back
             </span>
             <div className="overflow-x-auto max-w-full">
-              <StudentIdCardBack ref={backRef} student={liveStudent as Student} />
+              <StudentIdCardBack ref={backRef} student={liveStudent as StudentWithPhoto} />
             </div>
           </div>
 
@@ -104,7 +104,7 @@ export default function StudentIdCardModal({ student, onClose }: Props) {
 
       {editing && (
         <ChangeClassModal
-          student={liveStudent as Student}
+          student={liveStudent as StudentWithPhoto}
           onClose={() => setEditing(false)}
         />
       )}

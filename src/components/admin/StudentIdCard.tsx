@@ -1,9 +1,10 @@
 import { forwardRef } from "react";
 import { VSEC_SCHOOL } from "../../lib/constants";
-import type { Student } from "../../lib/types";
+import type { StudentWithPhoto } from "../../lib/types";
+import PhotoPlaceholder from "../ui/PhotoPlaceholder";
 
 type Props = {
-  student: Student;
+  student: StudentWithPhoto;
 };
 
 const CARD_WIDTH = 650;
@@ -109,6 +110,34 @@ function Row({
         {value || "—"}
       </span>
       <span style={{ height: 2, width: 28, background: accentColor, borderRadius: 1, marginTop: 2 }} />
+    </div>
+  );
+}
+
+function PhotoWell({ student }: { student: StudentWithPhoto }) {
+  return (
+    <div
+      style={{
+        width: 90,
+        height: 120,
+        borderRadius: 8,
+        overflow: "hidden",
+        flexShrink: 0,
+        alignSelf: "center",
+        border: "2px solid #ffffff",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+      }}
+    >
+      {student.photo?.url ? (
+        <img
+          src={student.photo.url}
+          alt=""
+          crossOrigin="anonymous"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      ) : (
+        <PhotoPlaceholder iconSize={36} />
+      )}
     </div>
   );
 }
@@ -230,11 +259,20 @@ const StudentIdCard = forwardRef<HTMLDivElement, Props>(function StudentIdCard(
           padding: "0 24px",
           height: CARD_HEIGHT - 112 - 6,
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: isVsec ? 22 : 32,
+          alignItems: "center",
+          gap: 20,
         }}
       >
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: isVsec ? 22 : 32,
+          }}
+        >
         <div>
           {!isVsec && (
             <span
@@ -285,6 +323,9 @@ const StudentIdCard = forwardRef<HTMLDivElement, Props>(function StudentIdCard(
             <Row label="Student Type" value={student.studentType ?? ""} accentColor={theme.accent} />
           )}
         </div>
+        </div>
+
+        <PhotoWell student={student} />
       </div>
 
       {/* Footer accent */}

@@ -139,6 +139,18 @@ const _schema = i.schema({
         label: "overriddenBy",
       },
     },
+    studentPhoto: {
+      forward: {
+        on: "students",
+        has: "one",
+        label: "photo",
+      },
+      reverse: {
+        on: "$files",
+        has: "many",
+        label: "studentPhotos",
+      },
+    },
   },
 });
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import { db } from "../../lib/db";
 import type { StudentWithPhoto } from "../../lib/types";
 import Modal from "../ui/Modal";

@@ -263,6 +263,8 @@ const StudentIdCard = forwardRef<HTMLDivElement, Props>(function StudentIdCard(
           gap: 20,
         }}
       >
+        <PhotoWell student={student} />
+
         <div
           style={{
             flex: 1,
@@ -324,8 +326,6 @@ const StudentIdCard = forwardRef<HTMLDivElement, Props>(function StudentIdCard(
           )}
         </div>
         </div>
-
-        <PhotoWell student={student} />
       </div>
 
       {/* Footer accent */}
